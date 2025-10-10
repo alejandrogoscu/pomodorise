@@ -1,0 +1,4 @@
+# Este archivo define qué carpetas contienen paquetes en nuestro monorepo
+# pnpm buscará package.json en estas rutas
+packages:
+  - 'packages/*'
