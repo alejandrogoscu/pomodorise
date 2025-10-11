@@ -2,24 +2,38 @@
  * Punto de entrada del servidor Express
  * Este archivo inicializa el servidor HTTP y carga configuración básica
 
- * Teacher note: Este es el primer archivo que se ejecuta cuando se inicia el backend
- * Aquí configuramos middleware global (cors, helmet, morgan) antes de las rutas
+ * Teacher note: 
+ * - Este es el primer archivo que se ejecuta cuando se inicia el backend
+ * - Aquí configuramos middleware global (cors, helmet, morgan) antes de las rutas
 */
 
 import express, { Application, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
+import path from "path";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import { connectDB } from "./config/db";
 
 // Carga variables de entorno desde .env
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 // Crea instancia de Express
 const app: Application = express();
 
 // Puerto del servidor (por defecto 4000)
 const PORT = process.env.PORT || 4000;
+
+// ====================================
+// CONEXIÓN A BASE DE DATOS
+// ====================================
+
+/*
+ * Teacher note:
+ * Conectamos a MongoDB antes de iniciar el servidor
+ * Si la conexión falla, el proceso se termina (ver db.ts)
+ */
+connectDB();
 
 // ====================================
 // MIDDLEWARE GLOBAL
@@ -113,8 +127,9 @@ app.use((req: Request, res: Response) => {
  * Manejador de errores global
  * Captura todos los errores que ocurran en la app
  *
- * Teacher note: El parámetro next es obligatorio aunque no se use,
- * porque Express reconoce error handlers por tener 4 parametros
+ * Teacher note:
+ * - El parámetro next es obligatorio aunque no se use,
+ *   porque Express reconoce error handlers por tener 4 parametros
  */
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error("❌ Error:", err.message);
@@ -139,12 +154,12 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
  */
 app.listen(PORT, () => {
   console.log(`
-    ╔═══════════════════════════════════════╗
-    ║   🍅 PomodoRise API Server            ║
-    ║   🚀 Running on port ${PORT}             ║
-    ║   📍 http://localhost:${PORT}            ║
-    ║   🌍 Environment: ${process.env.NODE_ENV || "development"}         ║
-    ╚═══════════════════════════════════════╝
+    =====================================================
+      🍅 PomodoRise API Server           
+      🚀 Running on port ${PORT}             
+      📍 http://localhost:${PORT}            
+      🌍 Environment: ${process.env.NODE_ENV || "development"}         
+    =====================================================
     `);
 });
 
