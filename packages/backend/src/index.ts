@@ -14,6 +14,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import { connectDB } from "./config/db";
+import authRoutes from "./routes/auth";
 
 // Carga variables de entorno desde .env
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
@@ -106,6 +107,15 @@ app.get("/", (_req: Request, res: Response) => {
     documentation: "/api-docs",
   });
 });
+
+/*
+ * Montar rutas de autenticación
+ *
+ * Teacher note:
+ * - Todas las rutas en authRoutes estarán bajo /api/auth
+ * - Ejemplo: POST /api/auth/register, POST /api/auth/login
+ */
+app.use("/api/auth", authRoutes);
 
 // ====================================
 // MANEJO DE ERRORES

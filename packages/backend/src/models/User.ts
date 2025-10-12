@@ -10,7 +10,7 @@
  * - Usamos bcrypt para hashear contraseñas (nunca guardar en texto plano)
  */
 
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 import bcrypt from "bcrypt";
 
 /*
@@ -21,6 +21,7 @@ import bcrypt from "bcrypt";
  * para que frontend y backend compartan tipos
  */
 export interface IUser extends Document {
+  _id: Types.ObjectId; // No se infiere automáticamente como ObjectId
   email: string;
   password: string; // Hash, nunca texto plano
   name?: string;
