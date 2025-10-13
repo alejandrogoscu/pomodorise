@@ -1,0 +1,22 @@
+{
+  "name": "@pomodorise/shared",
+  "version": "1.0.0",
+  "description": "Tipos, interfaces y utilidades compartidas entre backend y frontend",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "shared",
+    "types",
+    "utils"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
