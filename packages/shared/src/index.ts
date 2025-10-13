@@ -11,3 +11,6 @@
 
 // Exportar todos los tipos
 export * from "./types";
+
+// Exportar utilidades
+export * from "./utils/score";

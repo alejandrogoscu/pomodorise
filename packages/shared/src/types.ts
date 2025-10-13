@@ -1,14 +1,14 @@
-/*
+/**
  * Tipos y enums compartidos entre backend y frontend
  *
  * Teacher note:
- * - Estos tipos son la 'fuente de verdad' del dominio de la aplicación
+ * - Estos tipos son la "fuente de verdad" del dominio de la aplicación
  * - Backend usa estos tipos para validación con Zod
  * - Frontend los usa para tipar respuestas de la API
  * - Evitan duplicación y errores de sincronización
  */
 
-/*
+/**
  * Enum para estados de las tareas
  *
  * Teacher note:
@@ -21,7 +21,7 @@ export enum TaskStatus {
   COMPLETED = "completed",
 }
 
-/*
+/**
  * Enum para prioridades de tareas
  */
 export enum TaskPriority {
@@ -30,16 +30,7 @@ export enum TaskPriority {
   HIGH = "high",
 }
 
-/*
- * Enum para tipos de tareas
- */
-export enum TaskType {
-  WORK = "work",
-  SHORT_BREAK = "short_break",
-  LONG_BREAK = "long_break",
-}
-
-/*
+/**
  * Interface base para Usuario
  *
  * Teacher note:
@@ -58,7 +49,7 @@ export interface IUser {
   updatedAt: Date;
 }
 
-/*
+/**
  * Interface para Tareas
  *
  * Teacher note:
@@ -79,7 +70,7 @@ export interface ITask {
   updatedAt: Date;
 }
 
-/*
+/**
  * Interface para Sesiones de Pomodoro
  *
  * Teacher note:
@@ -90,8 +81,8 @@ export interface ISession {
   _id: string;
   userId: string;
   taskId?: string; // Opcional: puede ser una sesión sin tarea asignada
-  duration: number;
-  type: TaskType;
+  duration: number; // Duración en minutos (25 para pomodoro estándar)
+  type: "work" | "break" | "long_break";
   completed: boolean;
   pointsEarned: number;
   startedAt: Date;
@@ -100,13 +91,14 @@ export interface ISession {
   updatedAt: Date;
 }
 
-/*
+/**
  * DTOs (Data Transfer Objects) para requests del frontend
  *
  * Teacher note:
  * - Estos tipos representan la estructura de datos en requests HTTP
  * - Separan el modelo de BD de lo que el usuario envía
  */
+
 export interface RegisterDTO {
   email: string;
   password: string;
@@ -139,16 +131,17 @@ export interface UpdateTaskDTO {
 export interface CreateSessionDTO {
   taskId?: string;
   duration: number;
-  type: TaskType;
+  type: "work" | "break" | "long_break";
 }
 
-/*
+/**
  * Tipos para respuestas de la API
  *
  * Teacher note:
- * - Envuelven los datos en un formato consistente
+ * - Envuelven datos en un formato consistente
  * - Facilitan manejo de errores en frontend
  */
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
