@@ -9,5 +9,5 @@
  * - Em lugar de: `import { IUser } from '@pomodorise/shared/types'`
  */
 
-// Aquí exportaremos tipos y utils en las siguientes micro-subfases
-export {};
+// Exportar todos los tipos
+export * from "./types";
