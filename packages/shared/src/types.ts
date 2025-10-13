@@ -31,7 +31,7 @@ export enum TaskPriority {
 }
 
 /**
- * Interface base para Usuario
+ * Interface base para Usuario (para frontend y respuestas API)
  *
  * Teacher note:
  * - Omite detalles de implementación de Mongoose (save, remove, etc)
@@ -47,6 +47,29 @@ export interface IUser {
   streak: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+/*
+ * Interface para el documento Mongoose de User
+ *
+ * Teacher note:
+ * - Esta interface es SOLO para el backend
+ * - Incluye el campo password (hasheado) y métodos de Mongoose
+ * - Frontend NUNCA ve esta interface
+ */
+export interface IUserDocument {
+  _id: string;
+  email: string;
+  password: string; // Hash, nunca texto plano
+  name?: string;
+  level: number;
+  points: number;
+  streak: number;
+  createdAt: Date;
+  updatedAt: Date;
+
+  // Método personalizado apra comparar contraseñas
+  comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 /**
