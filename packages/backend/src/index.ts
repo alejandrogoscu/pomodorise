@@ -15,6 +15,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import { connectDB } from "./config/db";
 import authRoutes from "./routes/auth";
+import taskRoutes from "./routes/task";
 
 // Carga variables de entorno desde .env
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
@@ -116,6 +117,15 @@ app.get("/", (_req: Request, res: Response) => {
  * - Ejemplo: POST /api/auth/register, POST /api/auth/login
  */
 app.use("/api/auth", authRoutes);
+
+/*
+ * Montar rutas de tareas
+ *
+ * Teacher note:
+ * - Todas las rutas en taskRoutes estarán bajo /api/tasks
+ * - Ejemplo: GET /api/tasks, POST /api/tasks, DELETE /api/tasks/:id
+ */
+app.use("/api/tasks", taskRoutes);
 
 // ====================================
 // MANEJO DE ERRORES
