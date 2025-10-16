@@ -76,7 +76,7 @@ export const getSessions = async (
 
 /*
  * POST /api/sessions
- * Crea una nueva sesión de Pomodoro (iniciada pero on completada)
+ * Crea una nueva sesión de Pomodoro (iniciada pero no completada)
  *
  * Body esperado: CreateSessionDTO
  * {
