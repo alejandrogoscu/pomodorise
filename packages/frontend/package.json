@@ -1,0 +1,38 @@
+{
+  "name": "@pomodorise/frontend",
+  "version": "1.0.0",
+  "description": "PomodoRise - Frontend React con TypeScript y Vite",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "test": "vitest",
+    "clean": "rm -rf dist node_modules"
+  },
+  "keywords": [
+    "pomodoro",
+    "react",
+    "typescript",
+    "vite"
+  ],
+  "author": "Alejandro Goscu",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@pomodorise/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.9.3",
+    "vite": "^6.0.5",
+    "eslint": "^9.37.0",
+    "@typescript-eslint/parser": "^8.46.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.0",
+    "vitest": "^2.1.8"
+  }
+}
