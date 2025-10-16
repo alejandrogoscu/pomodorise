@@ -9,7 +9,6 @@
  */
 
 import { Router } from "express";
-import type { Router as ExpressRouter } from "express";
 import {
   getTask,
   getTaskById,
@@ -20,7 +19,7 @@ import {
 } from "../controllers/taskController";
 import { protect } from "../middlewares/auth";
 
-const router: ExpressRouter = Router();
+const router: Router = Router();
 
 // Todas las rutas requieren autenticación
 router.use(protect);

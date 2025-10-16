@@ -16,6 +16,7 @@ import morgan from "morgan";
 import { connectDB } from "./config/db";
 import authRoutes from "./routes/auth";
 import taskRoutes from "./routes/task";
+import sessionRoutes from "./routes/sessions";
 
 // Carga variables de entorno desde .env
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
@@ -126,6 +127,15 @@ app.use("/api/auth", authRoutes);
  * - Ejemplo: GET /api/tasks, POST /api/tasks, DELETE /api/tasks/:id
  */
 app.use("/api/tasks", taskRoutes);
+
+/*
+ * Montar ruta de sesiones
+ *
+ * Teacher note:
+ * - Todas las rutas en sessionRoutes estarán bajo /api/sessions
+ * - Ejemplo: POST /api/sessions, PATCH /api/sessions/:id/complete
+ */
+app.use("/api/sessions", sessionRoutes);
 
 // ====================================
 // MANEJO DE ERRORES
