@@ -49,6 +49,13 @@ logs/
 .yarn/
 
 # ====================================
+# Vite
+# ====================================
+dist/
+dist-ssr/
+*.local
+
+# ====================================
 # Docker (opcional, comentar si necesita)
 # ====================================
 # docker-compose.override.yml
