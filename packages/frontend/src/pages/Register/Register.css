@@ -1,0 +1,50 @@
+/* 
+ * Estilos para la página de Registro
+ *
+ * Teacher note:
+ * - Reutiliza estilos similares a Login
+ * - En producción, considerar crear un CSS compertido para auth pages
+*/
+
+.register-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  padding: 1rem;
+}
+
+.register-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.register-title {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.register-subtitle {
+  font-size: 0.95rem;
+  color: #666;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .register-container {
+    padding: 1.5rem;
+  }
+
+  .register-title {
+    font-size: 1.5rem;
+  }
+}
