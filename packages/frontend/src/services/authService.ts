@@ -21,13 +21,17 @@ import { RegisterDTO, LoginDTO, AuthResponse, IUser } from "@pomodorise/shared";
  * Teacher note:
  * - POST /api/auth/register
  * - El token se guarda en el localStorage desde el contexto
+ * - El backend devuelve { token, user } directamente, no envuelto en 'data'
  */
 export const register = async (data: RegisterDTO): Promise<AuthResponse> => {
-  const response = await api.post<{ data: AuthResponse }>(
-    "/auth/register",
+  const response = await api.post<AuthResponse & { message?: string }>(
+    "/api/auth/register",
     data
   );
-  return response.data.data;
+  return {
+    token: response.data.token,
+    user: response.data.user,
+  };
 };
 
 /*
@@ -39,10 +43,17 @@ export const register = async (data: RegisterDTO): Promise<AuthResponse> => {
  * Teacher note:
  * - POST /api/auth/login
  * - El backend valida contraseña con bcrypt y devuelve JWT
+ * - Similar a register, la respuesta viene sin wrapper 'data'
  */
 export const login = async (data: LoginDTO): Promise<AuthResponse> => {
-  const response = await api.post<{ data: AuthResponse }>("/auth/login", data);
-  return response.data.data;
+  const response = await api.post<AuthResponse & { message?: string }>(
+    "/api/auth/login",
+    data
+  );
+  return {
+    token: response.data.token,
+    user: response.data.user,
+  };
 };
 
 /*
@@ -53,10 +64,11 @@ export const login = async (data: LoginDTO): Promise<AuthResponse> => {
  * Teacher note:
  * - GET /api/auth/me
  * - Requiere token en header Authorization (axios lo añade automáticamente)
+ * - Esta ruta SÏ devuelve {user} envuelto
  */
 export const getCurrentUser = async (): Promise<IUser> => {
-  const response = await api.get<{ data: IUser }>("/auth/me");
-  return response.data.data;
+  const response = await api.get<{ user: IUser }>("/api/auth/me");
+  return response.data.user;
 };
 
 /*
