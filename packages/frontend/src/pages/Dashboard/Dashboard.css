@@ -76,6 +76,10 @@
   margin-bottom: 1.5rem;
 }
 
+.dashboard-user-info {
+  margin-bottom: 2rem;
+}
+
 /* Stats del usuario */
 .user-stats {
   display: grid;
@@ -108,6 +112,10 @@
   color: var(--color-primary);
 }
 
+.dashboard-timer-section {
+  margin: 2rem 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .dashboard-header {
@@ -132,5 +140,9 @@
 
   .user-stats {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-timer-section {
+    margin: 1rem 0;
   }
 }
