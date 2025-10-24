@@ -11,16 +11,16 @@
  * mientras que useTimer es el mecanismo interno (hace funcionar)
  */
 
-import { useTimer, TimerType } from "../../hooks/useTimer";
+import { useTimer /* TimerType */ } from "../../hooks/useTimer";
 import { formatTime, calculateProgress } from "../../utils/timeFormat";
 import "./Timer.css";
 
 /*
  * Props del componente Timer
  */
-interface TimerProps {
+/* interface TimerProps {
   onComplete?: (type: TimerType) => void; // Callback al completar sesión
-}
+} */
 
 /*
  * Componente Timer
@@ -31,7 +31,7 @@ interface TimerProps {
  * - onComplete se usará para notificaciones y guardar sesión en DB
  * - Por ahora es opcional (lo implementaremos en micro subfase 4.6)
  */
-function Timer({ onComplete }: TimerProps) {
+function Timer(/* { onComplete }: TimerProps */) {
   const {
     timeLeft,
     totalTime,

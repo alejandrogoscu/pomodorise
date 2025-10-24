@@ -136,7 +136,7 @@ export interface LoginDTO {
 export interface CreateTaskDTO {
   title: string;
   description?: string;
-  priority: TaskPriority;
+  priority?: TaskPriority;
   estimatedPomodoros: number;
   dueDate?: Date;
 }
@@ -183,4 +183,20 @@ export interface PaginatedResponse<T> {
   page: number;
   pageSize: number;
   totalPages: number;
+}
+
+/*
+ * Filtros para listar tareas
+ *
+ * Teacher note:
+ * - Permite filtrar tareas por estado (completadas, pendientes, todas)
+ * - Se usará en TaskList para pestañas de filtrado
+ *
+ * @example
+ * getTasks({completed: false, limit: 10})  // Primeras 10 pendientes
+ */
+export interface TaskFilters {
+  completed?: boolean;
+  limit?: number;
+  offset?: number;
 }
