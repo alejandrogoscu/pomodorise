@@ -12,6 +12,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Timer from "../../components/Timer/Timer";
 import "./Dashboard.css";
+import "../Form.css";
+import TaskForm from "@/components/TaskForm/TaskForm";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -72,6 +74,12 @@ const Dashboard = () => {
         {/* Placeholder para TaskList (micro-subfase 4.4) */}
         <div className="dashboard-card">
           <h3>Tareas</h3>
+          <TaskForm
+            onSuccess={(task) => {
+              console.log("Tarea creada:", task);
+              alert(`Tarea "${task.title}" creada exitosamente!`);
+            }}
+          />
           <p style={{ color: "var(--color-gray-600)" }}>
             Lista de tareas en construcción...
           </p>

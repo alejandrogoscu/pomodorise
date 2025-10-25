@@ -1,0 +1,88 @@
+/* 
+ * Estilos para TaskForm
+ *
+ * Teacher note:
+ * - Reutiliza estilos de Form.css (niputs, botones)
+ * - Estilos específicos para textarea y layout del formulario
+ * - Variables CSS para consistencia visual
+*/
+
+.task-form-container {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.task-form-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-gray-900);
+  margin: 0 0 1.5rem 0;
+}
+
+.task-form {
+  width: 100%;
+}
+
+/* 
+ * Textarea específico para descripción
+ *
+ * Teacher note:
+ * - Heredamos estilos de .form-input
+*/
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--color-gray-300);
+  border-radius: var(--border-radius-md);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: white;
+  field-sizing: content;
+  resize: vertical;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  &::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  &:disabled {
+    background-color: var(--color-gray-100);
+    cursor: not-allowed;
+  }
+}
+
+/* 
+ * Acciones del formulario (botones)
+ *
+ * - Teacher note:
+ * - flexbox para alinear botones horizontalmente
+ * - gap para espaciado entre botones
+*/
+.task-form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.task-form-actions .form-button {
+  flex: 1; /* Botones ocupan espacio equitativo */
+}
+
+/* Responsive: botones apilados en móvil */
+@media (max-width: 480px) {
+  .task-form-actions {
+    flex-direction: column;
+  }
+
+  .task-form-actions .form-button {
+    width: 100%;
+  }
+}
