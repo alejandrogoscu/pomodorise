@@ -7,7 +7,11 @@
  * - Centralizamos la URL base para facilitar cambios
  */
 
-import axios, { AxiosInstance, AxiosError } from "axios";
+import axios, {
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+  AxiosError,
+} from "axios";
 
 /*
  * Instancia de Axios configurada con URL base
@@ -33,8 +37,8 @@ const api: AxiosInstance = axios.create({
  * - Se añade automáticamente el header Authorization
  * - Formato: "Bearer <token>"
  */
-api.interceptors.response.use(
-  (config) => {
+api.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem("token");
 
     if (token) {

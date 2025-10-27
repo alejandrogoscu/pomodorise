@@ -196,7 +196,7 @@ export interface PaginatedResponse<T> {
  * getTasks({completed: false, limit: 10})  // Primeras 10 pendientes
  */
 export interface TaskFilters {
-  completed?: boolean;
+  status?: TaskStatus;
   limit?: number;
   offset?: number;
 }

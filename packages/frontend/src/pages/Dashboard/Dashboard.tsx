@@ -11,6 +11,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Timer from "../../components/Timer/Timer";
+import TaskList from "../../components/TaskList/TaskList";
 import "./Dashboard.css";
 import "../Form.css";
 
@@ -70,12 +71,9 @@ const Dashboard = () => {
           <Timer />
         </div>
 
-        {/* Placeholder para TaskList (micro-subfase 4.4) */}
+        {/* TaskList Component */}
         <div className="dashboard-card">
-          <h3>Tareas</h3>
-          <p style={{ color: "var(--color-gray-600)" }}>
-            Lista de tareas en construcción...
-          </p>
+          <TaskList />
         </div>
       </main>
     </div>

@@ -35,8 +35,8 @@ import {
 export const getTasks = async (filters?: TaskFilters): Promise<ITask[]> => {
   const params = new URLSearchParams();
 
-  if (filters?.completed !== undefined) {
-    params.append("completed", String(filters.completed));
+  if (filters?.status) {
+    params.append("status", filters.status);
   }
 
   if (filters?.limit) {
@@ -138,27 +138,36 @@ export const deleteTask = async (taskId: string): Promise<void> => {
   await api.delete(`/api/tasks/${taskId}`);
 };
 
-/*
+/**
  * Marca una tarea como completada o pendiente
  *
  * @param taskId - ID de la tarea
- * @param completed - true para completada, false para pendiente
+ * @param status - Nuevo estado (TaskStatus enum)
  * @returns Tarea actualizada
  *
- * @example
- * await toggleTaskCompletion('60d5ec49f1a2c8b1f8e4e1a1', true)
- *
  * Teacher note:
- * - Helper function para simplificar el toggle en UI
- * - Internamente llama a updateTask con { completed }
- * - Útil para checkboxes en TaskList
+ * - Ahora usamos TaskStatus.COMPLETED o TaskStatus.PENDING
+ * - Más flexible que un simple toggle booleano
  */
-export const toggleTaskCompletion = async (
+export const updateTaskStatus = async (
   taskId: string,
-  completed: boolean
+  status: TaskStatus
 ): Promise<ITask> => {
-  const newStatus = completed ? TaskStatus.COMPLETED : TaskStatus.PENDING;
-  return updateTask(taskId, { status: newStatus });
+  return updateTask(taskId, { status });
+};
+
+/*
+ * Marca una tarea como completada (helper)
+ */
+export const completeTask = async (taskId: string): Promise<ITask> => {
+  return updateTaskStatus(taskId, TaskStatus.COMPLETED);
+};
+
+/*
+ * Marca una tarea como pendiente (helper)
+ */
+export const markTaskPending = async (taskId: string): Promise<ITask> => {
+  return updateTaskStatus(taskId, TaskStatus.PENDING);
 };
 
 /*

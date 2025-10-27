@@ -63,7 +63,7 @@ describe("taskService", () => {
     test("debe aplicar filtros en query params", async () => {
       mockedApi.get.mockResolvedValueOnce({ data: { data: [] } });
 
-      await getTasks({ completed: true, limit: 5 });
+      await getTasks({ status: TaskStatus.COMPLETED, limit: 5 });
 
       expect(mockedApi.get).toHaveBeenLastCalledWith(
         expect.stringContaining("completed=true")

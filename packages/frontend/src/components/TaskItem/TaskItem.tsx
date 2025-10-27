@@ -11,7 +11,7 @@
  * (muestra info y acciones, pero el tablero controla la lista)
  */
 
-import { ITask, TaskStatus } from "@pomodorise/shared";
+import { ITask, TaskPriority, TaskStatus } from "@pomodorise/shared";
 import "./TaskItem.css";
 
 /*
@@ -44,6 +44,15 @@ interface TaskItemProps {
  */
 function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) {
   /*
+   * Determinar si la tarea está completada
+   *
+   * Teacher note:
+   * - Ahora comparamos con TaskStatus.COMPLETED
+   * - Más explícito y type-safe
+   */
+  const isCompleted = task.status === TaskStatus.COMPLETED;
+
+  /*
    * Calcular porcentaje de progreso
    *
    * Teacher note:
@@ -58,14 +67,31 @@ function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) {
 
   /*
    * Manejar toggle de completado
+   *
+   * Teacher note:
+   * - Si está completada, volver a PENDING
+   * - Si está pendiente o en progreso, marcar como COMPLETED
    */
   const handleToggleComplete = () => {
     if (onToggleComplete) {
-      const newStatus =
-        task.status === TaskStatus.COMPLETED
-          ? TaskStatus.PENDING
-          : TaskStatus.COMPLETED;
+      const newStatus = isCompleted ? TaskStatus.PENDING : TaskStatus.COMPLETED;
       onToggleComplete(task._id, newStatus);
+    }
+  };
+
+  /*
+   * Obtener clase CSS según prioridad
+   */
+  const getPriorityClass = (): string => {
+    switch (task.priority) {
+      case TaskPriority.HIGH:
+        return "task-priority-high";
+      case TaskPriority.MEDIUM:
+        return "task-priority-medium";
+      case TaskPriority.LOW:
+        return "task-priority-low";
+      default:
+        return "";
     }
   };
 
@@ -91,15 +117,15 @@ function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) {
   return (
     <div
       className={`task-item ${
-        task.status === TaskStatus.COMPLETED ? "task-item-completed" : ""
-      }`}
+        isCompleted ? "task-item-completed" : ""
+      } ${getPriorityClass()}`}
     >
       {/* Checkbox para marcar como completada */}
       <div className="task-item-checkbox">
         <input
           type="checkbox"
           id={`task-${task._id}`}
-          checked={task.status === TaskStatus.COMPLETED}
+          checked={isCompleted}
           onChange={handleToggleComplete}
           disabled={!onToggleComplete}
           className="task-checkbox"
@@ -112,8 +138,15 @@ function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) {
 
       {/* Contenido principal de la tarea */}
       <div className="task-item-content">
+        {/* Título con indicador de prioridad */}
         <h4 className="task-item title">{task.title}</h4>
+        {task.priority !== TaskPriority.MEDIUM && (
+          <span className={`task-priority-badge ${getPriorityClass()}`}>
+            {task.priority === TaskPriority.HIGH ? "🔴" : "🟢"}
+          </span>
+        )}
 
+        {/* Descripción si existe */}
         {task.description && (
           <p className="task-item-description">{task.description}</p>
         )}
