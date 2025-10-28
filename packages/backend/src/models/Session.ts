@@ -3,11 +3,12 @@
  *
  * Define el esquema de datos para sesiones de Pomodoro en MongoDB
  * Incluye: duración, tipo (work/break), puntos ganados y referencias a usuario/tarea
+ * Los puntos se calcuclan en sessionService usando utils de shared
  *
  * Teacher note:
- * - Las sessiones son el registro histórico de cada pomodoro completado
- * - Se usan para calcular estadísticas y rachas
- * - El campo pointsEarned se calcula con la utilidad de shared
+ * - El modelo solo define estructura de datos
+ * - La lógica de negocio (calcular puntos) va en el service layer
+ * - Esto facilita testing y reutilización
  */
 import mongoose, { Document, Schema, Types } from "mongoose";
 import { ISession } from "@pomodorise/shared";
@@ -72,6 +73,7 @@ const SessionSchema = new Schema<ISessionDocument>(
     startedAt: {
       type: Date,
       required: [true, "La fecha de inicio es obligatoria"],
+      default: Date.now,
     },
 
     completedAt: {
@@ -107,6 +109,16 @@ SessionSchema.virtual("actualDuration").get(function () {
 // Incluir virtuals en JSON
 SessionSchema.set("toJSON", { virtuals: true });
 SessionSchema.set("toObject", { virtuals: true });
+
+/*
+ * Índices compuestos para queries optimizadas
+ *
+ * Teacher note:
+ * - userId + createdAt: para listar sesiones recientes de un usuario
+ * - userId + completed: para calcular sesiones completadas
+ */
+SessionSchema.index({ userId: 1, createdAt: -1 });
+SessionSchema.index({ userId: 1, completed: 1 });
 
 // Exportar el modelo
 export default mongoose.model<ISessionDocument>("Session", SessionSchema);
