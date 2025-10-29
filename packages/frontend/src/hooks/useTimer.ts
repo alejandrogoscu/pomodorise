@@ -1,277 +1,321 @@
 /*
- * Hook personalizado para manejar la lógica del Timer de Pomodoro
+ * Hook personalizado para gestión del Timer
  *
  * Teacher note:
- * - Este hook NO renderiza UI, solo maneja estado y lógica
- * - Usa useEffect para el intervalo de cuenta regresiva
- * - Devuelve funciones y estado para que el componente las use
+ * - Maneja la creación y completado de sesiones en backend
+ * - Devuelve callbacks para notificar cambios (onComplete, onError)
+ * - Separa lógica de UI (Timer.tsx solo renderiza)
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import * as sessionService from "../services/sessionService";
 
 /*
- * Tipos de sesión de Pomodoro
+ * Tipo de sesión actual
  */
 export type TimerType = "work" | "break" | "long_break";
 
 /*
- * Estados del timer
+ * Estado del timer
  */
 export type TimerStatus = "idle" | "running" | "paused" | "completed";
 
 /*
- * Configuración del timer (en minutos)
+ * Duración de cada tipo de sesión (en segundos)
  *
  * Teacher note:
- * - Valores por defecto según técnica Pomodoro clásica
- * - 25 min trabajo, 5 min descanso corto, 15 min descanso largo
+ * - work: 25 minutos estándar de Pomodoro
+ * - break: 5 minutos de descanso corto
+ * - long_break: 15 minutos de descanso cada 4 pomodoros
  */
-interface TimerConfig {
-  work: number;
-  break: number;
-  longBreak: number;
-  longBreakInterval: number; // Cada cuántos pomodoros hacer descanso largo
-}
-
-const DEFAULT_CONFIG: TimerConfig = {
-  work: 25,
-  break: 5,
-  longBreak: 15,
-  longBreakInterval: 4,
+const DURATIONS: Record<TimerType, number> = {
+  work: 25 * 60,
+  break: 5 * 60,
+  long_break: 15 * 60,
 };
 
 /*
- * Interface de retorno del hook
+ * Props opcionales para configurar el timer
+ *
+ * Teacher note:
+ * - taskId: si el pomodo está asociado a una tarea
+ * - onComplete: callback cuando se completa una sesión
+ * - onSessionCreated: callback cuando se crea una sesión
+ * - onError: callback para manejar errores de red
  */
-interface UseTimerReturn {
-  // Estado
-  timeLeft: number; // Segundos restantes
-  totalTime: number; // Duración total de la sesión actual (segundos)
-  status: TimerStatus;
-  type: TimerType;
-  completedPomodoros: number;
-
-  // Acciones
-  start: () => void;
-  pause: () => void;
-  reset: () => void;
-  skip: () => void; // Saltar al siguiente tipo (work -> break, etc.)
-
-  // Configuración
-  setConfig: (config: Partial<TimerConfig>) => void;
+export interface UseTimerOptions {
+  taskId?: string;
+  onComplete?: (result: {
+    type: TimerType;
+    pointsEarned: number;
+    user: { level: number; points: number; streak: number };
+  }) => void;
+  onSessionCreated?: (sessionId: string) => void;
+  onError?: (error: Error) => void;
 }
 
 /*
- * Hook useTimer
+ * Hook useTimer con integración backend
  *
- * @params initialType - Tipo inicial del timer (por defecto "work")
- * @returns Estado y funciones del timer
+ * @param options - COnfiguración opcional (taskId, callbacks)
+ * @returns Estado y métodos del timer
  *
  * Teacher note:
- * - useRef para el intervalo evita re-renders innecesarios
- * - useCallback para evitar recrear funciones en cada render
- * - El timer cuenta en segundos para mayor precisión
+ * - Mantiene la misma API que antes
+ * - Añade lógica de red sin afectar componentes existentes
  */
-export function useTimer(initialType: TimerType = "work"): UseTimerReturn {
-  // Configuración del timer
-  const [config, setConfigState] = useState<TimerConfig>(DEFAULT_CONFIG);
+export function useTimer(options: UseTimerOptions = {}) {
+  const { taskId, onComplete, onSessionCreated, onError } = options;
 
   // Estado del timer
-  const [type, setType] = useState<TimerType>(initialType);
+  const [timeLeft, setTimeLeft] = useState<number>(DURATIONS.work);
   const [status, setStatus] = useState<TimerStatus>("idle");
-  const [timeLeft, setTimeLeft] = useState(config.work * 60); // Convertir minutos a segundos
-  const [totalTime, setTotalTime] = useState(config.work * 60);
-  const [completedPomodoros, setCompletedPomodoros] = useState(0);
+  const [type, setType] = useState<TimerType>("work");
+  const [completedPomodoros, setCompletedPomodoros] = useState<number>(0);
 
-  // Referencia al intervalo (no causa re-render)
-  const intervalRef = useRef<number | null>(null);
+  // Estado para integración con backend
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [isCreatingSession, setIsCreatingSession] = useState<boolean>(false);
+
+  // Referencia al intervalo
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   /*
-   * Actualizar configuración del timer
+   * Calcula duración total de la sesión actual
    *
    * Teacher note:
-   * - Permite personalizar duraciones desde componente padre
-   * - Resetea el timer para aplicar nueva configuración
+   * - Necesario para enviar al backend
+   * - Se usa en createSession y para el círculo de progreso
    */
-  const setConfig = useCallback((newConfig: Partial<TimerConfig>) => {
-    setConfigState((prev) => ({ ...prev, ...newConfig }));
+  const totalTime = DURATIONS[type];
+
+  /*
+   * Limpiar intervalo al desmontar
+   */
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, []);
 
   /*
-   * Calcular duración según tipo de sesión
+   * Crear sesión en el backend cuando se inicia el timer
    *
    * Teacher note:
-   * - Determina si el próximo break es corto o largo
-   * - Cada 4 pomodoros -> long break
+   * - Solo se crea si es sesión de trabajo (work)
+   * - Los breaks no se guardan en BD
+   * - Guarda el sessionId para completarla después
    */
-  const getDuration = useCallback(
-    (sessionType: TimerType): number => {
-      switch (sessionType) {
-        case "work":
-          return config.work * 60;
-        case "break":
-          return config.break * 60;
-        case "long_break":
-          return config.longBreak * 60;
-        default:
-          return config.work * 60;
+  const createSessionInBackend = useCallback(async () => {
+    // Solo crear sesión para pomodoros de trabajo
+    if (type !== "work") return;
+
+    setIsCreatingSession(true);
+
+    try {
+      const session = await sessionService.createSession({
+        taskId: taskId,
+        duration: Math.floor(totalTime / 60),
+        type: type,
+      });
+
+      setCurrentSessionId(session._id);
+
+      //Notificar creación de sesión
+      if (onSessionCreated) {
+        onSessionCreated(session._id);
       }
-    },
-    [config]
-  );
+
+      console.log("Sesión creada en backend:", session._id);
+    } catch (error: any) {
+      console.error("❌ Error al crear sesión:", error);
+
+      if (onError) {
+        onError(
+          new Error(
+            error.response?.data?.error ||
+              "Error al crear sesión en el servidor"
+          )
+        );
+      }
+    } finally {
+      setIsCreatingSession(false);
+    }
+  }, [type, totalTime, taskId, onSessionCreated, onError]);
 
   /*
-   * Iniciar el timer
+   * Completar sesión en el backend cuando finaliza el timer
+   *
    * Teacher note:
-   * - Si está en pausa, continúa desde donde se pausó
-   * - Si está completado o idle, reinicia
+   * - Solo se completa si hay sessionId (sesión de trabajo)
+   * - Obtiene puntos ganados y datos actualizados del usuario
+   * - Limpia el sessionId después de completar
+   */
+  const completeSessionInBackend = useCallback(async () => {
+    if (!currentSessionId) return;
+
+    try {
+      const result = await sessionService.completeSession(currentSessionId);
+
+      console.log("Session completada:", {
+        puntos: result.pointsEarned,
+        nivel: result.user.level,
+        racha: result.user.streak,
+      });
+
+      // Notificar completado
+      if (onComplete) {
+        onComplete({
+          type: type,
+          pointsEarned: result.pointsEarned,
+          user: result.user,
+        });
+      }
+
+      // Limpiar sessionId
+      setCurrentSessionId(null);
+    } catch (error: any) {
+      console.error("❌ Error al completar sesión:", error);
+
+      if (onError) {
+        onError(
+          new Error(
+            error.response?.data?.error ||
+              "Error al completar sesión en el servidor"
+          )
+        );
+      }
+    }
+  }, [currentSessionId, type, onComplete, onError]);
+
+  /*
+   * Iniciar o reanudar el timer
+   *
+   * Teacher note:
+   * - Si es la primera vez (idle), crea sesión en el backend
+   * - Si está pausado, solo reanuda (no crea otra sesión)
    */
   const start = useCallback(() => {
-    if (status === "running") return; // Ya está corriendo
+    // Si está idle, crear sesión en backend
+    if (status === "idle") {
+      createSessionInBackend();
+    }
 
     setStatus("running");
-  }, [status]);
+  }, [status, createSessionInBackend]);
 
   /*
    * Pausar el timer
    */
   const pause = useCallback(() => {
-    if (status !== "running") return;
-
     setStatus("paused");
-
-    // Limpiar intervalo
-    if (intervalRef.current !== null) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, [status]);
+  }, []);
 
   /*
-   * Resetear el timer al inicio de la seisón actual
+   * Resetear el timer
+   *
+   * Teacher note:
+   * - Limpia sessionId (sesión cancelada, no se completa)
+   * - Vuelve al estado inicial
    */
   const reset = useCallback(() => {
     setStatus("idle");
-    setTimeLeft(getDuration(type));
-
-    // Limpiar intervalo
-    if (intervalRef.current !== null) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, [type, getDuration]);
+    setType("work");
+    setTimeLeft(DURATIONS.work);
+    setCurrentSessionId(null);
+  }, []);
 
   /*
-   * Saltar al siguiente tipo de sesión
+   * Manejar completado de sesión y cambio de tipo
    *
    * Teacher note:
-   * - work -> break (o long_break si corresponde)
-   * - break/long_break -> work
-   * - Incrementa contador de pomodoros completados
+   * - Después de 4 pomodoros -> descanso largo
+   * - De lo contrario: work -> break -> work
    */
-  const skip = useCallback(() => {
-    let nextType: TimerType;
-
+  const handleSessionComplete = useCallback(() => {
     if (type === "work") {
-      // incrementar pomodoros completados
+      // Incrementar contador de pomodoros completados
       const newCount = completedPomodoros + 1;
       setCompletedPomodoros(newCount);
 
-      // Determina si es descanso largo o corto
-      nextType =
-        newCount % config.longBreakInterval === 0 ? "long_break" : "break";
+      // Después de 4 pomodoros -> long_break
+      if (newCount % 4 === 0) {
+        setType("long_break");
+        setTimeLeft(DURATIONS.long_break);
+      } else {
+        setType("break");
+        setTimeLeft(DURATIONS.break);
+      }
     } else {
-      // Después de cualquier break, volver a work
-      nextType = "work";
+      // Después de break -> volver a work
+      setType("work");
+      setTimeLeft(DURATIONS.work);
     }
 
-    const duration = getDuration(nextType);
-    setType(nextType);
-    setTimeLeft(duration);
-    setTotalTime(duration);
     setStatus("idle");
-
-    // Limpiar intervalo
-    if (intervalRef.current !== null) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, [type, completedPomodoros, config.longBreakInterval, getDuration]);
+  }, [type, completedPomodoros]);
 
   /*
-   * Efecto que maneja la cuenta regresiva
+   * Saltar al siguiente tipo de sesión
+   */
+  const skip = useCallback(() => {
+    handleSessionComplete();
+  }, [handleSessionComplete]);
+
+  /*
+   * Efecto: countdown del timer
    *
    * Teacher note:
-   * - Se ejecuta cada segundo cuando status === 'running'
-   * - Decrementa timeLeft hasta llegar a 0
-   * - Al completar, cambia status a 'completed'
-   * - Limpia el intervalo al desmontar o cambiar estado
+   * - Ahora completa sesión en backend cuando llega a 0
+   * - Espera a que se complete antes de cambiar de tipo
    */
   useEffect(() => {
-    if (status !== "running") {
-      // Limpiar intervalo si no está corriendo
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      return;
+    if (status === "running" && timeLeft > 0) {
+      intervalRef.current = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (status === "running" && timeLeft === 0) {
+      console.log(
+        "Timer terminado intentaod completar session:",
+        currentSessionId
+      );
+      // Timer completado
+      setStatus("completed");
+
+      // Completar sesión en backend (async, no bloqueante)
+      completeSessionInBackend();
+
+      // Auto-cambio de tipo después de 2 segundos
+      setTimeout(() => {
+        handleSessionComplete();
+      }, 2000);
     }
 
-    // Crear intervalo que se ejecuta cada segundo
-    intervalRef.current = window.setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          // Timer completado
-          setStatus("completed");
-
-          // Limpiar intervalo
-          if (intervalRef.current !== null) {
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
-          }
-          return 0;
-        }
-
-        return prev - 1;
-      });
-    }, 1000);
-
-    // Cleanup: limpiar intervalo al desmontar o cambiar dependencias
     return () => {
-      if (intervalRef.current !== null) {
+      if (intervalRef.current) {
         clearInterval(intervalRef.current);
-        intervalRef.current = null;
       }
     };
-  }, [status]);
-
-  /*
-   * Efecto para actualizar totalTime cuando cambia el tipo
-   *
-   * Teacher note:
-   * - totalTime se usa para calcular el progreso (timeleft / totalTime)
-   */
-  useEffect(() => {
-    const duration = getDuration(type);
-    setTotalTime(duration);
-    setTimeLeft(duration);
-  }, [type, getDuration]);
+  }, [status, timeLeft, completeSessionInBackend, handleSessionComplete]);
 
   return {
-    // Estado
+    // Estado del timer
     timeLeft,
     totalTime,
     status,
     type,
     completedPomodoros,
 
+    // Estados de backend
+    currentSessionId,
+    isCreatingSession,
+
     // Acciones
     start,
     pause,
     reset,
     skip,
-
-    // Configuración
-    setConfig,
   };
 }
