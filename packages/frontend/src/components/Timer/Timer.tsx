@@ -2,8 +2,9 @@
  * Componente Timer - Interfaz visual del Pomodoro
  *
  * Teacher note:
- * - Componente presentacional (no maneja lógica de negocio)
+ * - Componente presentacional (no maneja lógica de negocio) solo renderiza
  * - Usa el hook useTimer para obtener estado y acciones
+ * - Usa callbacks para notificar eventos al componente padre
  * - SVG para el círculo de progreso animado
  * - CSS separado para mantener componente limpio
  *
@@ -11,47 +12,73 @@
  * mientras que useTimer es el mecanismo interno (hace funcionar)
  */
 
+import { useCallback } from "react";
 import { useTimer /* TimerType */ } from "../../hooks/useTimer";
 import { formatTime, calculateProgress } from "../../utils/timeFormat";
 import "./Timer.css";
 
 /*
- * Props del componente Timer
- */
-/* interface TimerProps {
-  onComplete?: (type: TimerType) => void; // Callback al completar sesión
-} */
-
-/*
  * Componente Timer
  *
- * @param onComplete - Función a ejecutar cuando se completa una sesión
- *
  * Teacher note:
- * - onComplete se usará para notificaciones y guardar sesión en DB
- * - Por ahora es opcional (lo implementaremos en micro subfase 4.6)
+ * - Integra callbacks para manejar eventos de sesiones
+ * - Muestra feedback visual durante creación de sesión (loading)
+ * - Modifica cuando se completa una sesión (puntos, nivel, racha)
  */
-function Timer(/* { onComplete }: TimerProps */) {
+function Timer() {
+  /*
+   * Callbacks para manejar eventos de sesiones
+   *
+   * Teacher note:
+   * - onComplete: ejecutado cuando se completa una sesión de trabajo
+   * - onSessionCreated: ejecutado cuando se crea una sesión en backend
+   * - onError: maneja errores de red
+   */
+  const handleComplete = useCallback(
+    (result: {
+      type: "work" | "break" | "long_break";
+      pointsEarned: number;
+      user: { level: number; points: number; streak: number };
+    }) => {
+      // TODO: En subfase 4.5.2 mostraremos notificación visual
+      console.log("Sesión completada:", {
+        tipo: result.type,
+        puntos: result.pointsEarned,
+        nivel: result.user.level,
+        racha: result.user.streak,
+      });
+    },
+    []
+  );
+
+  const handleSessionCreated = useCallback((sessionId: string) => {
+    console.log("Sesión creada:", sessionId);
+  }, []);
+
+  const handleError = useCallback((error: Error) => {
+    console.error("❌ Error en sesión:", error.message);
+    // TODO: En subfase 4.5.2 mostraremos notificación de error
+  }, []);
+
+  /*
+   * Inicializar hook con callbacks
+   */
   const {
     timeLeft,
     totalTime,
     status,
     type,
     completedPomodoros,
+    isCreatingSession,
     start,
     pause,
     reset,
     skip,
-  } = useTimer();
-
-  /*
-   * Ejecutar callback cuando se completa
-   *
-   * Teacher note:
-   * - useEffect vigilará cambios en status
-   * - Si status === 'completed', ejecutamos onComplete
-   * - Lo implementaremos cuando integremos con backend (mmicro-subfase 4.5)
-   */
+  } = useTimer({
+    onComplete: handleComplete,
+    onSessionCreated: handleSessionCreated,
+    onError: handleError,
+  });
 
   /*
    * Calcular progreso para el círculo SVG
@@ -154,7 +181,8 @@ function Timer(/* { onComplete }: TimerProps */) {
           <span className="timer time">{formatTime(timeLeft)}</span>
           <span className="timer-status-text">
             {status === "idle" && "Listo para empezar"}
-            {status === "running" && "En progreso"}
+            {status === "running" && !isCreatingSession && "En progreso"}
+            {status === "running" && isCreatingSession && "Guardando sesión..."}
             {status === "paused" && "En pausa"}
             {status === "completed" && "¡Completado!"}
           </span>
@@ -165,15 +193,27 @@ function Timer(/* { onComplete }: TimerProps */) {
       <div className="timer-controls">
         {/* Botón principal: Start/Pause según estado */}
         {status === "idle" || status === "completed" ? (
-          <button className="timer-button timer-button-primary" onClick={start}>
+          <button
+            className="timer-button timer-button-primary"
+            onClick={start}
+            disabled={isCreatingSession}
+          >
             {status === "completed" ? "Reiniciar" : "Iniciar"}
           </button>
         ) : status === "running" ? (
-          <button className="timer-button timer-button-warning" onClick={pause}>
+          <button
+            className="timer-button timer-button-warning"
+            onClick={pause}
+            disabled={isCreatingSession}
+          >
             Pausar
           </button>
         ) : (
-          <button className="timer-button timer-button-primary" onClick={start}>
+          <button
+            className="timer-button timer-button-primary"
+            onClick={start}
+            disabled={isCreatingSession}
+          >
             Continuar
           </button>
         )}
@@ -183,20 +223,30 @@ function Timer(/* { onComplete }: TimerProps */) {
           <button
             className="timer-button timer-button-secondary"
             onClick={reset}
+            disabled={isCreatingSession}
           >
             Reiniciar
           </button>
         )}
 
         {/* Botón Skip */}
-        <button className="timer-button timer-button-secondary" onClick={skip}>
+        <button
+          className="timer-button timer-button-secondary"
+          onClick={skip}
+          disabled={isCreatingSession}
+        >
           Saltar
         </button>
       </div>
 
       {/* Indicador visual del estado */}
       <div className={`timer-indicator timer-indicator-${status}`}>
-        {status === "running" && <span className="timer-pulse">●</span>}
+        {status === "running" && !isCreatingSession && (
+          <span className="timer-pulse">●</span>
+        )}
+        {isCreatingSession && (
+          <span className="timer-loading">Conenctando con servidor...</span>
+        )}
       </div>
     </div>
   );
