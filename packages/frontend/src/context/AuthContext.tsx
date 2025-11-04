@@ -33,6 +33,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name?: string) => Promise<void>;
   logout: () => void;
+  updateUser: (updates: Partial<IUser>) => void;
 }
 
 /*
@@ -160,6 +161,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   /*
+   * Actualiza datos del usuario en el estado
+   *
+   * @params updates - Objeto parcial con campos a actualizar
+   *
+   * Teacher note:
+   * - Útil cuando el backend devuelve datos actualizados (puntos, nivel, racha)
+   * - Evita hacer una petición adicional solo para refrescar el usuario
+   * - Se usa después de completar una sesión de Pomodoro
+   */
+  const handleUpdateUser = (updates: Partial<IUser>): void => {
+    if (user) {
+      setUser({ ...user, ...updates });
+    }
+  };
+
+  /*
    * Valor del contexto que se pasa a los hijos
    *
    * Teacher note:
@@ -173,6 +190,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login: handleLogin,
     register: handleRegister,
     logout: handleLogout,
+    updateUser: handleUpdateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

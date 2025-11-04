@@ -1,0 +1,125 @@
+/* 
+ * Estilos del componente Toast
+ *
+ * Teacher note:
+ * - Fixed positioning para flotar sobre el contenido
+ * - Animaciones de entrada/salida suaves
+ * - Colores según tipo de notificación
+*/
+
+/* ========================================
+   CONTENEDOR PRINCIPAL
+   ======================================== */
+.toast {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  min-width: 300px;
+  max-width: 400px;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out;
+}
+
+/* 
+ * Animación de entrada
+ *
+ * Teacher note:
+ * - Desliza desde arriba con fade-in
+ * - Duración corta para no molestar al usuario
+*/
+@keyframes slideIn {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   VARIANTES POR TIPO
+   ======================================== */
+.toast-succes {
+  border-left: 4px solid var(--color-success);
+}
+
+.toast-error {
+  border-left: 4px solid var(--color-error);
+}
+
+.toast-info {
+  border-left: 4px solid var(--color-primary);
+}
+
+/* ========================================
+   ELEMENTOS INTERNOS
+   ======================================== */
+.toast-icon {
+  font-size: 1.5rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.toast-succes .toast-icon {
+  color: var(--color-success);
+}
+
+.toast-error .toast-icon {
+  color: var(--color-error);
+}
+
+.toast-info .toast-icon {
+  color: var(--color-primary);
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--color-gray-700);
+  line-height: 1.4;
+}
+
+/* 
+ * Botón de cerrar
+ *
+ * Teacher note:
+ * - Interacción opcional si el usuario quiere cerrar antes
+ * - Hover state para feedback visual
+*/
+toast-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--color-gray-400);
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.toast-close:hover {
+  color: var(--color-gray-700);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 640px) {
+  .toast {
+    top: 1rem;
+    right: 1rem;
+    left: 1rem;
+    min-width: auto;
+    max-width: none;
+  }
+}

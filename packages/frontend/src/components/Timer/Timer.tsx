@@ -12,10 +12,20 @@
  * mientras que useTimer es el mecanismo interno (hace funcionar)
  */
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useTimer /* TimerType */ } from "../../hooks/useTimer";
+import { useAuth } from "../../context/AuthContext";
 import { formatTime, calculateProgress } from "../../utils/timeFormat";
+import Toast from "../Toast/Toast";
 import "./Timer.css";
+
+/*
+ * Tipo para notificaciones Toast
+ */
+interface ToastNotification {
+  message: string;
+  type: "success" | "error" | "info";
+}
 
 /*
  * Componente Timer
@@ -26,6 +36,9 @@ import "./Timer.css";
  * - Modifica cuando se completa una sesión (puntos, nivel, racha)
  */
 function Timer() {
+  const { updateUser } = useAuth();
+  const [toast, setToast] = useState<ToastNotification | null>(null);
+
   /*
    * Callbacks para manejar eventos de sesiones
    *
@@ -40,15 +53,27 @@ function Timer() {
       pointsEarned: number;
       user: { level: number; points: number; streak: number };
     }) => {
-      // TODO: En subfase 4.5.2 mostraremos notificación visual
-      console.log("Sesión completada:", {
-        tipo: result.type,
-        puntos: result.pointsEarned,
-        nivel: result.user.level,
-        racha: result.user.streak,
+      // Actualizar contexto de usuario con nuevos valores
+      updateUser({
+        level: result.user.level,
+        points: result.user.points,
+        streak: result.user.streak,
       });
+
+      // Mostrar notificación según tipo de sesión
+      if (result.type === "work") {
+        setToast({
+          type: "success",
+          message: `¡Sesión completada! +${result.pointsEarned} puntos. Nivel ${result.user.level} • Racha ${result.user.streak}`,
+        });
+      } else {
+        setToast({
+          type: "info",
+          message: "Descanso completado. ¡Listo para continuar!",
+        });
+      }
     },
-    []
+    [updateUser]
   );
 
   const handleSessionCreated = useCallback((sessionId: string) => {
@@ -57,7 +82,10 @@ function Timer() {
 
   const handleError = useCallback((error: Error) => {
     console.error("❌ Error en sesión:", error.message);
-    // TODO: En subfase 4.5.2 mostraremos notificación de error
+    setToast({
+      type: "error",
+      message: `Error: ${error.message}`,
+    });
   }, []);
 
   /*
@@ -134,6 +162,15 @@ function Timer() {
 
   return (
     <div className="timer-container">
+      {/* Notificación Toast */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       {/* Header con tipo de sesión y contador de pomodoros */}
       <div className="timer-header">
         <h2 className="timer-type">{getTypeLabel()}</h2>
@@ -245,7 +282,7 @@ function Timer() {
           <span className="timer-pulse">●</span>
         )}
         {isCreatingSession && (
-          <span className="timer-loading">Conenctando con servidor...</span>
+          <span className="timer-loading">Conectando con servidor...</span>
         )}
       </div>
     </div>
