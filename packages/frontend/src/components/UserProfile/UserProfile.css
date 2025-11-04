@@ -1,0 +1,231 @@
+/*
+ * Estilos del componente UserProfile
+ *
+ * Teacher note:
+ * - Usa variables CSS globales definidas en index.css (DRY)
+ * - Diseño card con flexbox para layout responsive
+ * - Animación suave en hover y en barra de progreso
+ * - Sin estilos inline (todo en CSS)
+ */
+
+/* ========================================
+   CONTENEDOR PRINCIPAL
+   ======================================== */
+
+.user-profile {
+  display: flex;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-secondary) 100%
+  );
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  color: white;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/*
+ * Efecto hover
+ *
+ * Teacher note:
+ * - Feedback sutil al pasar el mouse
+ * - Transform para elevar ligeramente la tarjeta
+ */
+.user-profile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   AVATAR
+   ======================================== */
+
+.user-profile-avatar {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-profile-avatar-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+}
+
+/* ========================================
+   INFORMACIÓN DEL USUARIO
+   ======================================== */
+
+.user-profile-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.user-profile-name {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.user-profile-email {
+  margin: 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ========================================
+   ESTADÍSTICAS (nivel, puntos, racha)
+   ======================================== */
+
+.user-profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.user-profile-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-md);
+}
+
+.user-profile-stat-icon {
+  font-size: 1.5rem;
+}
+
+.user-profile-stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.user-profile-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+}
+
+/* ========================================
+   SECCIÓN DE NIVEL
+   ======================================== */
+
+.user-profile-level-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.user-profile-level-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.user-profile-level-text {
+  font-weight: 600;
+  color: white;
+}
+
+.user-profile-level-remaining {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ========================================
+   BARRA DE PROGRESO
+   ======================================== */
+
+.level-progress {
+  width: 100%;
+}
+
+.level-progress-track {
+  position: relative;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/*
+ * Barra de progreso animada
+ *
+ * Teacher note:
+ * - width se controla desde el componente con style inline (única excepción permitida)
+ * - transition para animación suave cuando cambia el porcentaje
+ * - gradiente para efecto visual atractivo
+ * - Usa var(--color-warning) para consistencia con tema global
+ */
+.level-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-warning) 0%, #f59e0b 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.5s ease-in-out;
+  box-shadow: var(--shadow-sm);
+}
+
+.level-progress-text {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+/*
+ * En pantallas pequeñas, cambiar a layout vertical
+ *
+ * Teacher note:
+ * - Mobile-first approach: diseño base para escritorio
+ * - Media query para ajustar en móviles
+ */
+@media (max-width: 640px) {
+  .user-profile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--spacing-lg);
+  }
+
+  .user-profile-avatar {
+    width: 64px;
+    height: 64px;
+  }
+
+  .user-profile-avatar-text {
+    font-size: 1.5rem;
+  }
+
+  .user-profile-name {
+    font-size: 1.25rem;
+  }
+
+  .user-profile-stats {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+}
