@@ -2,7 +2,8 @@
  * Hook personalizado para gestión del Timer
  *
  * Teacher note:
- * - Maneja la creación y completado de sesiones en backend
+ * - Maneja la creación y completado de sesiones en backend para todos los tipos.
+ * - Usa sessionService para las llamadas a la API (separación de responsabilidades)
  * - Devuelve callbacks para notificar cambios (onComplete, onError)
  * - Separa lógica de UI (Timer.tsx solo renderiza)
  */
@@ -104,31 +105,29 @@ export function useTimer(options: UseTimerOptions = {}) {
    * Crear sesión en el backend cuando se inicia el timer
    *
    * Teacher note:
-   * - Solo se crea si es sesión de trabajo (work)
-   * - Los breaks no se guardan en BD
-   * - Guarda el sessionId para completarla después
+   * - Crea sesión para todos los tipos (work, break, long_break)
+   * - Usa sessionService.createSession() para separar lógica de red
+   * - Backend calcula puntos según el tipo usando score.ts
+   * - Esto gamifica también los descansos (2 puntos break, 5 puntos long_break)
    */
   const createSessionInBackend = useCallback(async () => {
-    // Solo crear sesión para pomodoros de trabajo
-    if (type !== "work") return;
-
-    setIsCreatingSession(true);
-
     try {
+      setIsCreatingSession(true);
+
       const session = await sessionService.createSession({
-        taskId: taskId,
-        duration: Math.floor(totalTime / 60),
-        type: type,
+        duration: Math.floor(totalTime / 60), // Convertir segundos a minutos
+        type,
+        taskId, // Puede ser undefined si no hay tarea
       });
 
       setCurrentSessionId(session._id);
 
-      //Notificar creación de sesión
+      // Notificar al componente padre
       if (onSessionCreated) {
         onSessionCreated(session._id);
       }
 
-      console.log("Sesión creada en backend:", session._id);
+      setStatus("running");
     } catch (error: any) {
       console.error("❌ Error al crear sesión:", error);
 
@@ -149,7 +148,7 @@ export function useTimer(options: UseTimerOptions = {}) {
    * Completar sesión en el backend cuando finaliza el timer
    *
    * Teacher note:
-   * - Solo se completa si hay sessionId (sesión de trabajo)
+   * - Completa sesiones de todos los tipos
    * - Obtiene puntos ganados y datos actualizados del usuario
    * - Limpia el sessionId después de completar
    */
@@ -168,7 +167,7 @@ export function useTimer(options: UseTimerOptions = {}) {
       // Notificar completado
       if (onComplete) {
         onComplete({
-          type: type,
+          type,
           pointsEarned: result.pointsEarned,
           user: result.user,
         });
@@ -278,7 +277,7 @@ export function useTimer(options: UseTimerOptions = {}) {
       }, 1000);
     } else if (status === "running" && timeLeft === 0) {
       console.log(
-        "Timer terminado intentaod completar session:",
+        "Timer terminado intentando completar session:",
         currentSessionId
       );
       // Timer completado

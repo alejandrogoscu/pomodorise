@@ -13,7 +13,7 @@
  */
 
 import { useCallback, useState } from "react";
-import { useTimer /* TimerType */ } from "../../hooks/useTimer";
+import { useTimer } from "../../hooks/useTimer";
 import { useAuth } from "../../context/AuthContext";
 import { formatTime, calculateProgress } from "../../utils/timeFormat";
 import Toast from "../Toast/Toast";
@@ -64,12 +64,18 @@ function Timer() {
       if (result.type === "work") {
         setToast({
           type: "success",
-          message: `¡Sesión completada! +${result.pointsEarned} puntos. Nivel ${result.user.level} • Racha ${result.user.streak}`,
+          message: `¡Sesión completada! +${result.pointsEarned} puntos. Nivel ${result.user.level} • Racha ${result.user.streak}. ¡Sigue así!`,
         });
-      } else {
+      } else if (result.type === "break") {
         setToast({
           type: "info",
-          message: "Descanso completado. ¡Listo para continuar!",
+          message: `¡Descanso corto completado! +${result.pointsEarned} puntos.`,
+        });
+      } else {
+        // Long_break
+        setToast({
+          type: "info",
+          message: `¡Descanso largo completado! +${result.pointsEarned} puntos. ¡Excelente trabajo!`,
         });
       }
     },
