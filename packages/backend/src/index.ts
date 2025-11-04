@@ -17,6 +17,7 @@ import { connectDB } from "./config/db";
 import authRoutes from "./routes/auth";
 import taskRoutes from "./routes/task";
 import sessionRoutes from "./routes/sessions";
+import statsRoutes from "./routes/stats";
 
 // Carga variables de entorno desde .env
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
@@ -136,6 +137,11 @@ app.use("/api/tasks", taskRoutes);
  * - Ejemplo: POST /api/sessions, PATCH /api/sessions/:id/complete
  */
 app.use("/api/sessions", sessionRoutes);
+
+/*
+ * Montar rutas de Stats
+ */
+app.use("/api/stats", statsRoutes);
 
 // ====================================
 // MANEJO DE ERRORES
