@@ -9,7 +9,7 @@
 
 import { Response } from "express";
 import { AuthRequest } from "./authController";
-import { CreateSessionDTO } from "@pomodorise/shared";
+import { CreateSessionDTO, UserStats } from "@pomodorise/shared";
 import * as sessionService from "../services/sessionService";
 
 /*
@@ -163,8 +163,15 @@ export const completeSession = async (
 
 /*
  * GET /api/sessions/stats
+ * GET /api/stats (alias)
  *
- * Obtiene estadísticas de sesiones del usuario
+ *
+ * Obtiene estadísticas de sesiones del usuario autenticado
+ *
+ * Teacher note:
+ * - Usa UserStats de shared para garantizar tipo consistente
+ * - Calcula totalSessions. totalMinutes, completedPomodoros, etc.
+ * - sessionsPerDay agrupa por fecha (útil para gráficos)
  */
 export const getSessionStats = async (
   req: AuthRequest,
@@ -176,12 +183,84 @@ export const getSessionStats = async (
       return;
     }
 
-    // Usar SERVICE LAYER
-    const stats = await sessionService.getSessionStats(req.user._id.toString());
+    // Obtener todas las sesiones completadas del usuario
+    const sessions = await sessionService.getUserSessions(
+      req.user._id.toString(),
+      { completed: true }
+    );
 
-    res.status(200).json({ success: true, data: stats });
+    /*
+     * Calcular estadísticas según UserStats de shared
+     *
+     * Teacher note:
+     * - totalSessions: cantidad de sesiones completadas
+     * - totalMinutes: suma de duración de todas las sesiones
+     * - completedPomodoros: solo sesiones de tipo "work"
+     * - averageSessionDuration: promedio redondeado
+     * - pointsEarned: suma de puntos de todas las sesiones
+     */
+    const totalSessions = sessions.length;
+
+    const totalMinutes = sessions.reduce(
+      (sum, session) => sum + session.duration,
+      0
+    );
+
+    const completedPomodoros = sessions.filter(
+      (session) => session.type === "work"
+    ).length;
+
+    const averageSessionDuration =
+      totalSessions > 0 ? Math.round(totalMinutes / totalSessions) : 0;
+
+    const pointsEarned = sessions.reduce(
+      (sum, session) => sum + (session.pointsEarned || 0),
+      0
+    );
+
+    /*
+     * Agrupar sesiones por día para gráficos
+     *
+     * Teacher note:
+     * - Convierte Date a string YYYY-MM-DD
+     * - Agrupa sesiones del mismo día
+     * - Útil para Recharts en frontend
+     */
+    const sessionsPerDayMap = new Map<string, number>();
+
+    sessions.forEach((session) => {
+      const dateStr = session.startedAt.toISOString().split("T")[0];
+      const currentCount = sessionsPerDayMap.get(dateStr) || 0;
+      sessionsPerDayMap.set(dateStr, currentCount + 1);
+    });
+
+    // Convertir Map a array de objetos y ordenar por fecha
+    const sessionsPerDay = Array.from(sessionsPerDayMap.entries())
+      .map(([date, count]) => ({ date, count }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    /*
+     * Construir respuesta con tipo UserStats
+     *
+     * Teacher note:
+     * - TypeScript verifica que coincida con UserStats de shared
+     * - Si falta un campo, error de compilación
+     */
+    const stats: UserStats = {
+      totalSessions,
+      totalMinutes,
+      completedPomodoros,
+      averageSessionDuration,
+      sessionsPerDay,
+      pointsEarned,
+    };
+
+    res.status(200).json({
+      succes: true,
+      data: stats,
+    });
   } catch (error) {
-    console.error("❌ Error en getSessionStats:", error);
+    console.error("❌ Error al obtener estadísticas:", error);
     res.status(500).json({
       error: "Error al obtener estadísticas",
     });

@@ -72,6 +72,23 @@ export interface IUserDocument {
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
+/*
+ * Interface para estadísticas del usuario
+ *
+ * Teacher note:
+ * - Compartida entre backend (calcula) y frontend (muestra)
+ * - Estructura compatible con Recharts para gráficos
+ * - sessionsPerDay: agrupa sesiones por fecha para timeline
+ */
+export interface UserStats {
+  totalSessions: number;
+  totalMinutes: number;
+  completedPomodoros: number;
+  averageSessionDuration: number;
+  sessionsPerDay: Array<{ date: string; count: number }>;
+  pointsEarned: number;
+}
+
 /**
  * Interface para Tareas
  *
