@@ -1,0 +1,100 @@
+/* ========================================
+   CONTENEDOR DEL GRÁFICO
+   ======================================== */
+
+.sessions-chart {
+  padding: var(--spacing-xl);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-secondary) 100%
+  );
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  color: white;
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sessions-chart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   HEADER DEL GRÁFICO
+   ======================================== */
+
+.sessions-chart-header {
+  margin-bottom: var(--spacing-lg);
+}
+
+.sessions-chart-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+}
+
+.sessions-chart-subtitle {
+  margin: var(--spacing-xs) 0 0 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ========================================
+   ESTADO VACÍO
+   ======================================== */
+
+.sessions-chart-empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sessions-chart-empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: var(--spacing-md);
+}
+
+.sessions-chart-empty-content p {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.sessions-chart-empty-icon {
+  font-size: 3rem;
+  opacity: 0.5;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+/* 
+ * En pantallas pequeñas, ajustar padding
+ *
+ * Teacher note:
+ * - Recharts ya es responsive por ResponsiveContainer
+ * - Solo necesitamos ajustar espaciados
+*/
+@media (max-width: 640px) {
+  .sessions-chart {
+    padding: var(--spacing-lg);
+  }
+
+  .sessions-chart-title {
+    font-size: 1rem;
+  }
+
+  .sessions-chart-subtitle {
+    font-size: 0.75rem;
+  }
+}
