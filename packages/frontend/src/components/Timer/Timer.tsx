@@ -166,6 +166,15 @@ function Timer() {
     }
   };
 
+  /*
+   * Determinar si aplicar efecto pulse al círculo
+   *
+   * Teacher note:
+   * - Solo cuando está corriendo y no está guardando sesión
+   * - Feedback visual sutil de que el timer está activo
+   */
+  const shouldPulse = status === "running" && !isCreatingSession;
+
   return (
     <div className="timer-container">
       {/* Notificación Toast */}
@@ -185,10 +194,10 @@ function Timer() {
         </span>
       </div>
 
-      {/* Círculo de progreso SVG */}
+      {/* Círculo de progreso SVG con efecto pulse */}
       <div className="timer-circle-container">
         <svg
-          className="timer-circle"
+          className={`timer-circle ${shouldPulse ? "timer-circle-pulse" : ""}`}
           viewBox="0 0 300 300"
           preserveAspectRatio="xMidYMid meet"
         >
@@ -221,7 +230,7 @@ function Timer() {
 
         {/* Tiempo en el centro del cículo */}
         <div className="timer-display">
-          <span className="timer time">{formatTime(timeLeft)}</span>
+          <span className="timer-time">{formatTime(timeLeft)}</span>
           <span className="timer-status-text">
             {status === "idle" && "Listo para empezar"}
             {status === "running" && !isCreatingSession && "En progreso"}
@@ -240,24 +249,27 @@ function Timer() {
             className="timer-button timer-button-primary"
             onClick={start}
             disabled={isCreatingSession}
+            aria-label={status === "completed" ? "Reiniciar" : "Iniciar"}
           >
-            {status === "completed" ? "Reiniciar" : "Iniciar"}
+            {status === "completed" ? "⏮" : "▶"}
           </button>
         ) : status === "running" ? (
           <button
             className="timer-button timer-button-warning"
             onClick={pause}
             disabled={isCreatingSession}
+            aria-label="Pausar"
           >
-            Pausar
+            ⏸
           </button>
         ) : (
           <button
             className="timer-button timer-button-primary"
             onClick={start}
             disabled={isCreatingSession}
+            aria-label="Reanudar"
           >
-            Continuar
+            ▶
           </button>
         )}
 
@@ -267,8 +279,9 @@ function Timer() {
             className="timer-button timer-button-secondary"
             onClick={reset}
             disabled={isCreatingSession}
+            aria-label="Reiniciar"
           >
-            Reiniciar
+            ⏮
           </button>
         )}
 
@@ -277,16 +290,14 @@ function Timer() {
           className="timer-button timer-button-secondary"
           onClick={skip}
           disabled={isCreatingSession}
+          aria-label="Saltar"
         >
-          Saltar
+          ⏭
         </button>
       </div>
 
       {/* Indicador visual del estado */}
       <div className={`timer-indicator timer-indicator-${status}`}>
-        {status === "running" && !isCreatingSession && (
-          <span className="timer-pulse">●</span>
-        )}
         {isCreatingSession && (
           <span className="timer-loading">Conectando con servidor...</span>
         )}

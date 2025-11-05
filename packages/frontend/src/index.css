@@ -9,9 +9,11 @@
 
 :root {
   /* Colores primarios */
-  --color-primary: #667eea;
-  --color-primary-dark: #5568d3;
-  --color-secondary: #764ba2;
+  --color-primary: #320a6b;
+  --color-primary-dark: #065084;
+  --color-secondary: #0f828c;
+  --color-accent: #78b9b5;
+  --color-hover: #95d1cd;
 
   /* Colores de estado */
   --color-success: #28a745;
@@ -70,7 +72,7 @@ body {
   font-family: var(--font-family);
   line-height: 1.5;
   color: var(--color-gray-900);
-  background-color: var(--color-gray-50);
+  background-color: var(--color-gray-900);
 }
 
 /* Tipografía base */

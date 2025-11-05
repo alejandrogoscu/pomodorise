@@ -1,19 +1,13 @@
-/* 
- * Estilos del componente Timer
- *
- * Teacher note:
- * - Mobile-first: diseño responsive
- * - Animaciones suaves con transitions
- * - Variables CSS para mantener consistencia
- * - SVG para círculos de progreso (escalable sin pérdida de calidad)
-*/
-
 .timer-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
-  background: white;
+  padding: var(--spacing-xl);
+  background: linear-gradient(
+    180deg,
+    var(--color-secondary) 0%,
+    var(--color-primary) 100%
+  );
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
   max-width: 500px;
@@ -29,19 +23,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-lg);
 }
 
 .timer-type {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--color-gray-900);
+  color: var(--color-gray-50);
   margin: 0;
 }
 
 .timer-pomodoros {
   font-size: 0.95rem;
-  color: var(--color-gray-600);
+  color: var(--color-gray-200);
   font-weight: 500;
 }
 
@@ -50,35 +44,43 @@
    ======================================== */
 .timer-circle-container {
   position: relative;
-  width: 300px;
-  height: 300px;
-  margin: 2rem auto;
+  width: 270px;
+  height: 270px;
+  margin: var(--spacing-sm) auto;
 }
 
-/* SVG del cítculo - responsive
- * 
- * Teacher note:
- * - width/height 100% para que se adapte al contenedor
- * - display: block elimina espacios extra del inline
-*/
+/* SVG del cítculo - responsive */
 .timer-circle {
   width: 100%;
   height: 100%;
   display: block;
+  transform-origin: center center;
+  transition: transform 0.3s ease;
+}
+
+.timer-circle.timer-circle-pulse {
+  animation: circlePulse 2s ease-in-out infinite;
+}
+
+@keyframes circlePulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .timer-circle-progress {
-  /* Transición suave del progreso */
   transition: stroke-dashoffset 1s linear;
 }
 
-/* 
- * Display del tiempo (centrado en el círculo)
- *
- * Teacher note:
- * - position: absolute para centrar sobre el SVG
- * - transform: translate para centrado perfecto
-*/
 .timer-display {
   position: absolute;
   top: 50%;
@@ -87,21 +89,21 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
   width: 80%;
 }
 
 .timer-time {
-  font-size: 4rem;
+  font-size: 3rem;
   font-weight: 700;
-  color: var(--color-gray-900);
+  color: var(--color-gray-100);
   font-variant-numeric: tabular-nums; /* Números monoespacio */
   line-height: 1;
 }
 
 .timer-status-text {
   font-size: 0.9rem;
-  color: var(--color-gray-500);
+  color: var(--color-gray-100);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   text-align: center;
@@ -116,11 +118,11 @@
    ======================================== */
 .timer-controls {
   display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
   width: 100%;
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: center;
 }
 
 /* 
@@ -131,48 +133,53 @@
  * - Transiciones suaves para hover/active
 */
 .timer-button {
-  padding: 0.875rem 2rem;
+  padding: var(--spacing-sm) var(--spacing-md);
   border: none;
   border-radius: var(--border-radius-md);
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  min-width: 120px;
+  min-width: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .timer-button-primary {
-  background-color: var(--color-primary);
-  color: white;
+  background-color: var(--color-accent);
+  color: black;
+}
 
-  &:hover {
-    background-color: var(--color-primary-dark);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
+.timer-button-primary:hover:not(:disabled) {
+  background-color: var(--color-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .timer-button-warning {
   background-color: var(--color-warning);
   color: var(--color-gray-900);
+}
 
-  &:hover {
-    background-color: #e0a800;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
+.timer-button-warning:hover:not(:disabled) {
+  background-color: #e0a800;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .timer-button-secondary {
-  background-color: var(--color-gray-200);
+  background-color: var(--color-gray-300);
   color: var(--color-gray-700);
-
-  &:hover {
-    background-color: var(--color-gray-300);
-  }
 }
 
-.timer-button:active {
+.timer-button-secondary:hover:not(:disabled) {
+  background-color: var(--color-gray-400);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.timer-button:active:not(:disabled) {
   transform: translateY(0);
 }
 
@@ -191,31 +198,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* 
- * Animación de pulso cuando está corriendo
- * 
- * Teacher note:
- * - Feedback visual sutil de que el timer está activo
- * - Keyframe animation con scale y opacity
-*/
-.timer-pulse {
-  color: var(--color-success);
-  font-size: 1.5rem;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(1.2);
-  }
 }
 
 /* 
@@ -246,12 +228,12 @@
    ======================================== */
 @media (max-width: 480px) {
   .timer-container {
-    padding: 1.5rem;
+    padding: var(--spacing-lg);
   }
 
   .timer-header {
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--spacing-sm);
     text-align: center;
   }
 
@@ -262,42 +244,29 @@
   .timer-circle-container {
     width: 250px;
     height: 250px;
-    margin: 1.5rem auto;
+    margin: var(--spacing-lg) auto;
   }
 
   .timer-time {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
 
   .timer-status-text {
-    font-size: 0.8rem; /* Reducir tamaño en móvil */
-    white-space: normal; /* Permitir saltos de línea en móvil */
+    font-size: 0.8rem;
+    white-space: normal;
   }
 
   .timer-display {
-    width: 90%; /* Más ancho en móvil para textos largos */
+    width: 90%;
   }
 
   .timer-button {
-    min-width: 100px;
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
+    min-width: 50px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 1.25rem;
+  }
+
+  .timer-controls {
+    gap: var(--spacing-sm);
   }
 }
-
-/* Dark mode (opcional, para futuro */
-/* @media (prefers-color-scheme: dark) {
-  .timer-container {
-    background: var(--color-gray-800);
-  }
-
-  .timer-type,
-  .timer-time {
-    color: var(--color-gray-50);
-  }
-
-  .timer-status-text {
-    color: var(--color-gray-400);
-  }
-}
- */
