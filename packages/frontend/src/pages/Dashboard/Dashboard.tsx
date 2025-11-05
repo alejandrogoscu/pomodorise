@@ -1,22 +1,40 @@
 /*
- * Página del Dashboard (con Timer integrado)
+ * Página del Dashboard - Hub principal de la aplicación
  *
  * Teacher note:
- * - Ahora usamos useAuth() para obtener datos del usuario
- * - logout() viene del contexto (no necesitamos implementarlo aqui)
- * - Mantenemos la estructura header + contenido
- * - en micro-subfases siguientes añadiremos TaskList aquí
+ * - Usa bento grid layout para organizar componentes por prioridad
+ * - Integra useAuth() para datos del usuario y useStats() para estadísticas
+ * - Componentes prioritarios: Timer, TaskList, UserProfile
+ * - Componentes secundarios: SessionsChart, StatsCards
+ * - Maneja estados de loading y error de forma centralizada
+ *
+ * Analogía: Dashboard es como el cockpit de un avión
+ * (muestra todos los controles e indicadores importantes en un solo lugar)
  */
 
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useStats } from "../../hooks/useStats";
+import { useNavigate } from "react-router-dom";
+import UserProfile from "../../components/UserProfile/UserProfile";
 import Timer from "../../components/Timer/Timer";
 import TaskList from "../../components/TaskList/TaskList";
+import SessionsChart from "../../components/Stats/SessionsChart";
+import StatsCard from "../../components/StatsCard/StatsCard";
 import "./Dashboard.css";
-import "../Form.css";
 
+/*
+ * Componente Dashboard
+ *
+ * @returns Vista principal con todos los componentes organizados en bento grid
+ *
+ * Teacher note:
+ * - useAuth() para obtener datos del usuario y logout
+ * - useStats() para obtener estadísticas (loading, error, refetch)
+ * - Grid CSS con áreas nombradas para layout flexible
+ */
 const Dashboard = () => {
   const { user, logout } = useAuth();
+  const { stats, isLoading: statsLoading, error: StatsError } = useStats();
   const navigate = useNavigate();
 
   /*
@@ -33,6 +51,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-page">
+      {/* Header con info del usuario y logout */}
       <header className="dashboard-header">
         <h1 className="dashboard-title">PomodoRise</h1>
         <div className="header-user">
@@ -43,38 +62,78 @@ const Dashboard = () => {
         </div>
       </header>
 
+      {/* Contenido principal con bento grid */}
       <main className="dashboard-content">
-        {/* Infromación del usuario */}
-        <div className="dashboard-card dashboard-user-info">
-          <h2>Hola, {user?.name || "Usuario"}</h2>
+        {/* ÁREA 1: UserProfile (prioridad alta) */}
+        <section className="dashboard-grid-profile">
+          <UserProfile />
+        </section>
 
-          <div className="user-stats">
-            <div className="stat-item">
-              <span className="stat-label">Nivel</span>
-              <span className="stat-value">{user?.level}</span>
-            </div>
-
-            <div className="stat-item">
-              <span className="stat-label">Puntos</span>
-              <span className="stat-value">{user?.points}</span>
-            </div>
-
-            <div className="stat-item">
-              <span className="stat-label">Racha</span>
-              <span className="stat-value">{user?.streak}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Timer Component */}
-        <div className="dashboard-timer-section">
+        {/* ÁREA 2: Timer (prioridad alta) */}
+        <section className="dashboard-grid-timer">
           <Timer />
-        </div>
+        </section>
 
-        {/* TaskList Component */}
-        <div className="dashboard-card">
+        {/* ÁREA 3: TaskList (prioridad alta) */}
+        <section className="dashboard-grid-tasks">
           <TaskList />
-        </div>
+        </section>
+
+        {/* ÁREA 4: SessionsChart (secundario) */}
+        <section className="dashboard-grid-chart">
+          {statsLoading ? (
+            <div className="dashboard-loading-card">
+              <div className="spinner" />
+              <p>Cargando estadísticas...</p>
+            </div>
+          ) : StatsError ? (
+            <div className="dashboard-error-card">
+              <p>Error al cargar gráfico</p>
+            </div>
+          ) : (
+            <SessionsChart data={stats?.sessionsPerDay || []} />
+          )}
+        </section>
+
+        {/* ÁREA 5: StatsCards grid (secundario) */}
+        <section className="dashboard-grid-stats">
+          {statsLoading ? (
+            <div className="dashboard-loading-card">
+              <div className="spinner" />
+            </div>
+          ) : StatsError ? (
+            <div className="dashboard-error-card">
+              <p>Error al cargar stats</p>
+            </div>
+          ) : stats ? (
+            <>
+              <StatsCard
+                icon="🎯"
+                label="Total sesiones"
+                value={stats.totalSessions}
+                color="primary"
+              />
+              <StatsCard
+                icon="⏱️"
+                label="Minutos totales"
+                value={stats.totalMinutes}
+                color="success"
+              />
+              <StatsCard
+                icon="🍅"
+                label="Pomodoros"
+                value={stats.completedPomodoros}
+                color="warning"
+              />
+              <StatsCard
+                icon="⭐"
+                label="Puntos ganados"
+                value={stats.pointsEarned}
+                color="info"
+              />
+            </>
+          ) : null}
+        </section>
       </main>
     </div>
   );
