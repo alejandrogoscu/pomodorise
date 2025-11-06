@@ -55,7 +55,7 @@ function Toast({
   /*
    * Obtener icono según tipo
    */
-  const getIcon = () => {
+  /* const getIcon = () => {
     switch (type) {
       case "success":
         return "✓";
@@ -65,11 +65,10 @@ function Toast({
       default:
         return "ℹ";
     }
-  };
+  }; */
 
   return (
     <div className={`toast toast-${type}`} role="alert">
-      <span className="toast-icon">{getIcon()}</span>
       <span className="toast-message">{message}</span>
       <button className="toast-close" onClick={onClose} aria-label="Cerrar">
         x

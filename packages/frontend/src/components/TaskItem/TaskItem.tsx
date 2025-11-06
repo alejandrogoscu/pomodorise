@@ -28,7 +28,7 @@ interface TaskItemProps {
   task: ITask;
   onToggleComplete?: (taskId: string, newStatus: TaskStatus) => void;
   onEdit?: (task: ITask) => void;
-  onDelete?: (taskId: string) => void;
+  onDelete?: (taskId: string, taskTitle: string) => void;
 }
 
 /*
@@ -108,11 +108,9 @@ function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) {
    * Manejar click en eliminar
    */
   const handleDelete = () => {
-    if (onDelete)
-      if (window.confirm(`¿Eliminar "${task.title}"?`)) {
-        // Confirmar antes de eliminar
-        onDelete(task._id);
-      }
+    if (onDelete) {
+      onDelete(task._id, task.title);
+    }
   };
   return (
     <div

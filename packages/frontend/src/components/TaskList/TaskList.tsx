@@ -6,8 +6,8 @@
  * - Compone TaskItem (presentacional) y TaskForm (para editar)
  * - Filtros por TaskStatus: pending, in_progress, completed, all
  * - Empty states para UX clara (sin tareas, loading, error)
- * - Usa TaskFilters de shared para mantener coherencia con API
  * - Expone loadTasks() al Dashboard mediante forwardRef
+ * - NUEVO: Sistema Toast para notificaciones (reemplaza alert)
  *
  * Analogía: TaskList es como un tablero Kanban que organiza tarjetas
  */
@@ -27,6 +27,7 @@ import {
 } from "../../services/taskService";
 import TaskItem from "../TaskItem/TaskItem";
 import TaskForm from "../TaskForm/TaskForm";
+import Toast from "../Toast/Toast";
 import "./TaskList.css";
 
 /*
@@ -38,6 +39,18 @@ import "./TaskList.css";
  * - Separamos el tipo de UI del tipo de API
  */
 type UIFilterType = "all" | TaskStatus;
+
+/*
+ * Tipo para notificaciones Toast
+ *
+ * Teacher note:
+ * - type: determina color y estilo del Toast
+ * - message: texto a mostrar al usuario
+ */
+interface ToastNotification {
+  message: string;
+  type: "success" | "error" | "info";
+}
 
 /*
  * Métodos expuestos al componente padre (Dashboard)
@@ -67,7 +80,6 @@ interface TaskListProps {
  * Teacher note:
  * - forwardRef permite exponer métodos al padre
  * - useImperativeHandle define qué métodos son públicos
- * - No recibe props (solo ref), por eso se usa _ para ignorar el parámetro
  */
 const TaskList = forwardRef<TaskListHandle, TaskListProps>(
   ({ onTaskChange }, ref) => {
@@ -83,6 +95,9 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
     // Estado de edición
     const [editingTask, setEditingTask] = useState<ITask | null>(null);
     const [showForm, setShowForm] = useState(false);
+
+    // Estado para Toast (NUEVO)
+    const [toast, setToast] = useState<ToastNotification | null>(null);
 
     /*
      * Cargar tareas desde el backend
@@ -119,10 +134,6 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
 
     /*
      * Cargar tareas al montar el componente
-     *
-     * Teacher note:
-     * - useEffect con array vacío [] se ejecuta solo una vez
-     * - Similar a componentDidMount en class components
      */
     useEffect(() => {
       loadTasks();
@@ -130,11 +141,6 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
 
     /*
      * Aplicar filtro cuando cambian tareas o filtro activo
-     *
-     * Teacher note:
-     * - useEffect se ejecuta cada vez que tasks o activeFilter cambian
-     * - Evita duplicar lógica de filtrado
-     * - Filtramos en cliente para UX más rápida (listas pequeñas)
      */
     useEffect(() => {
       if (activeFilter === "all") {
@@ -146,10 +152,6 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
 
     /*
      * Manejar cambio de filtro
-     *
-     * Teacher note:
-     * - Solo actualiza el estado local (filtrado en cliente)
-     * - Alternativa: llamar a loadTasks() con filtro en servidor
      */
     const handleFilterChange = (newFilter: UIFilterType) => {
       setActiveFilter(newFilter);
@@ -159,8 +161,7 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
      * Manejar toggle de completado
      *
      * Teacher note:
-     * - Actualiza estado en backend y luego en cliente
-     * - Optimistic update: podríamos actualizar UI primero y rollback si falla
+     * - ACTUALIZADO: Ahora usa Toast en lugar de alert()
      */
     const handleToggleComplete = async (
       taskId: string,
@@ -173,18 +174,27 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
         setTasks((prevTasks) =>
           prevTasks.map((task) => (task._id === taskId ? updatedTask : task))
         );
+
+        // Mostrar Toast de éxito (opcional, depende de la UX deseada)
+        // setToast({
+        //   type: "success",
+        //   message: `Tarea ${newStatus === TaskStatus.COMPLETED ? 'completada' : 'actualizada'}`,
+        // });
       } catch (err: any) {
         console.error("Error al actualizar tarea:", err);
-        alert("Error al actualizar la tarea. Intenta de nuevo.");
+
+        // ❌ Mostrar Toast de error en lugar de alert()
+        setToast({
+          type: "error",
+          message:
+            err.response?.data?.error ||
+            "Error al actualizar la tarea. Intenta de nuevo.",
+        });
       }
     };
 
     /*
      * Manejar click en editar
-     *
-     * Teacher note:
-     * - Guarda tarea a editar y muestra formulario
-     * - TaskForm recibe task como prop y se comporta en modo edición
      */
     const handleEdit = (task: ITask) => {
       setEditingTask(task);
@@ -193,11 +203,6 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
 
     /*
      * Manejar éxito al crear/editar tarea
-     *
-     * Teacher note:
-     * - Si editingTask existe → actualizar
-     * - Si no existe → agregar nueva
-     * - Resetea estado de formulario
      */
     const handleTaskSuccess = (task: ITask) => {
       if (editingTask) {
@@ -214,7 +219,7 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
       setShowForm(false);
       setEditingTask(null);
 
-      // Notificar cambio para refrescar Timer
+      // 🔄 Notificar cambio para refrescar Timer
       onTaskChange?.();
     };
 
@@ -230,11 +235,10 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
      * Manejar eliminación de tarea
      *
      * Teacher note:
-     * - Elimina en backend primero
-     * - Luego actualiza estado local
-     * - Sin confirmación (mejora: agregar modal de confirmación)
+     * - ACTUALIZADO: Ahora recibe taskTitle y muestra Toast
+     * - Reemplaza alert() por sistema Toast no bloqueante
      */
-    const handleDelete = async (taskId: string) => {
+    const handleDelete = async (taskId: string, taskTitle: string) => {
       try {
         await deleteTask(taskId);
 
@@ -243,20 +247,29 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
           prevTasks.filter((task) => task._id !== taskId)
         );
 
-        // Notificar cambio para refrescar Timer
+        // 🔄 Notificar cambio para refrescar Timer
         onTaskChange?.();
+
+        // 🎉 Mostrar Toast de éxito
+        setToast({
+          type: "success",
+          message: `Tarea "${taskTitle}" eliminada correctamente`,
+        });
       } catch (err: any) {
         console.error("Error al eliminar tarea:", err);
-        alert("Error al eliminar la tarea. Intenta de nuevo.");
+
+        // ❌ Mostrar Toast de error
+        setToast({
+          type: "error",
+          message:
+            err.response?.data?.error ||
+            "Error al eliminar la tarea. Intenta de nuevo.",
+        });
       }
     };
 
     /*
      * Obtener contador de tareas por filtro
-     *
-     * Teacher note:
-     * - Calcula en cliente (eficiente para listas pequeñas)
-     * - Si la lista es grande (1000+), mejor obtener contadores del backend
      */
     const getFilterCount = (filter: UIFilterType): number => {
       if (filter === "all") return tasks.length;
@@ -283,6 +296,15 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
 
     return (
       <div className="task-list-container">
+        {/* Notificación Toast (NUEVO) */}
+        {toast && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
+        )}
+
         {/* Header con botón de nueva tarea */}
         <div className="task-list-header">
           <h2 className="task-list-title">Mis Tareas</h2>
@@ -291,7 +313,7 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
               className="task-list-new-button"
               onClick={() => setShowForm(true)}
             >
-              Nueva tarea
+              + Nueva tarea
             </button>
           )}
         </div>
@@ -352,6 +374,7 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
             {filteredTasks.length === 0 ? (
               // Empty state
               <div className="task-list-empty">
+                <p className="empty-icon">📝</p>
                 <h3>
                   No hay tareas{" "}
                   {activeFilter !== "all" &&
