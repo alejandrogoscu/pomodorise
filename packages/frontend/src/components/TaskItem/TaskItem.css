@@ -114,13 +114,12 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  margin-top: var(--spacing-sm);
 }
 
 .task-progress-bar {
   flex: 1;
   height: 8px;
-  background-color: var(--color-gray-100);
+  background-color: var(--color-gray-200);
   border-radius: 4px;
   overflow: hidden;
 }

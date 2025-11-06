@@ -5,15 +5,15 @@ import { useAuth } from "../../context/AuthContext";
 import { useStats } from "../../hooks/useStats";
 import { useNavigate } from "react-router-dom";
 import UserProfile from "../../components/UserProfile/UserProfile";
-import Timer from "../../components/Timer/Timer";
-import TaskList, { TaskListHandle } from "../../components/TaskList/TaskList"; // 👈 Importar tipo
+import Timer, { TimerHandle } from "../../components/Timer/Timer";
+import TaskList, { TaskListHandle } from "../../components/TaskList/TaskList"; //
 import SessionsChart from "../../components/Stats/SessionsChart";
 import StatsCard from "../../components/StatsCard/StatsCard";
 import "./Dashboard.css";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
-  const { stats, isLoading: statsLoading, error: statsError } = useStats(); // 👈 Corregir typo StatsError
+  const { stats, isLoading: statsLoading, error: statsError } = useStats(); //
   const navigate = useNavigate();
 
   /*
@@ -24,14 +24,33 @@ const Dashboard = () => {
    * - React.RefObject<TaskListHandle> es el tipo correcto
    */
   const taskListRef = useRef<TaskListHandle>(null);
+  const timerRef = useRef<TimerHandle>(null);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
+  /*
+   * Callback cuando Timer completa un pomodoro work
+   *
+   * Teacher note:
+   * - Timer notifica → Dashboard refresca TaskList
+   * - Mantiene lista sincronizada con completedPomodoros actualizados
+   */
   const handlePomodoroCompleted = () => {
     taskListRef.current?.loadTasks();
+  };
+
+  /*
+   * Callback cuando TaskList crea/actualiza una tarea
+   *
+   * Teacher note:
+   * - TaskList notifica -> Dashboard refresca selector de Timer
+   * - Permite seleccionar tarea recién creada sin recargar página
+   */
+  const handleTaskListChange = () => {
+    timerRef.current?.reloadTasks();
   };
 
   return (
@@ -52,11 +71,11 @@ const Dashboard = () => {
         </section>
 
         <section className="dashboard-grid-timer">
-          <Timer onPomodoroCompleted={handlePomodoroCompleted} />
+          <Timer ref={timerRef} onPomodoroCompleted={handlePomodoroCompleted} />
         </section>
 
         <section className="dashboard-grid-tasks">
-          <TaskList ref={taskListRef} />
+          <TaskList ref={taskListRef} onTaskChange={handleTaskListChange} />
         </section>
 
         <section className="dashboard-grid-chart">
