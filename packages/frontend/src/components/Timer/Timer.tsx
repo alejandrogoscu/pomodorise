@@ -7,15 +7,18 @@
  * - Usa callbacks para notificar eventos al componente padre
  * - SVG para el círculo de progreso animado
  * - CSS separado para mantener componente limpio
+ * - Selector de tarea para vincular sesiones con tareas
  *
  * Analogía: El Timer es como un reloj en la pared (solo muestra)
  * mientras que useTimer es el mecanismo interno (hace funcionar)
  */
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useTimer } from "../../hooks/useTimer";
 import { useAuth } from "../../context/AuthContext";
 import { formatTime, calculateProgress } from "../../utils/timeFormat";
+import { getTasks } from "../../services/taskService";
+import { ITask, TaskStatus } from "@pomodorise/shared";
 import Toast from "../Toast/Toast";
 import "./Timer.css";
 
@@ -33,11 +36,59 @@ interface ToastNotification {
  * Teacher note:
  * - Integra callbacks para manejar eventos de sesiones
  * - Muestra feedback visual durante creación de sesión (loading)
- * - Modifica cuando se completa una sesión (puntos, nivel, racha)
+ * - Notifica cuando se completa una sesión (puntos, nivel, racha)
+ * -  Carga tareas activas para vincular con sesiones
  */
 function Timer() {
   const { updateUser } = useAuth();
   const [toast, setToast] = useState<ToastNotification | null>(null);
+
+  /*
+   * Estado para selector de tareas
+   *
+   * Teacher note:
+   * - activeTasks: solo tareas pendientes o en progreso
+   * - selectedTaskId: tarea actualmente seleccionada
+   * - isLoadingTask: feedback visual durante carga
+   */
+  const [activeTasks, setActiveTasks] = useState<ITask[]>([]);
+  const [selectedTaskId, setSelectedTaskId] = useState<string>("");
+  const [isLoadingTasks, setIsLoadingTasks] = useState(false);
+
+  /*
+   * Carga tareas activas al montar el componente
+   *
+   * Teacher note:
+   * - Solo cargamos tareas PENDING e IN_PROGRESS
+   * - Las tareas completadas no aparecen en el selector
+   * - useEffect con [] se ejecuta solo una vez (al montar)
+   */
+  useEffect(() => {
+    const loadActiveTasks = async () => {
+      setIsLoadingTasks(true);
+      try {
+        // Cargar todas las tareas y filtrar en cliente
+        // (más eficiente que 2 llamadas al backend)
+        const allTasks = await getTasks();
+        const active = allTasks.filter(
+          (task) =>
+            task.status === TaskStatus.PENDING ||
+            task.status === TaskStatus.IN_PROGRESS
+        );
+        setActiveTasks(active);
+      } catch (error) {
+        console.error("Error al cargar tareas:", error);
+        setToast({
+          type: "error",
+          message: "Error al cargar tareas disponibles",
+        });
+      } finally {
+        setIsLoadingTasks(false);
+      }
+    };
+
+    loadActiveTasks();
+  }, []);
 
   /*
    * Callbacks para manejar eventos de sesiones
@@ -95,7 +146,11 @@ function Timer() {
   }, []);
 
   /*
-   * Inicializar hook con callbacks
+   * Inicializar hook con callbacks y taskId seleccionado
+   *
+   * Teacher note:
+   * - Pasamos selectedTaskId o undefined si no hay selección
+   * - useTimer se encargará de enviarlo al backend al crear sesión
    */
   const {
     timeLeft,
@@ -109,6 +164,7 @@ function Timer() {
     reset,
     skip,
   } = useTimer({
+    taskId: selectedTaskId || undefined,
     onComplete: handleComplete,
     onSessionCreated: handleSessionCreated,
     onError: handleError,
@@ -192,6 +248,34 @@ function Timer() {
         <span className="timer-pomodoros">
           {completedPomodoros} completados
         </span>
+      </div>
+
+      {/* Selector de tarea */}
+      <div className="timer-task-selector">
+        <label htmlFor="task-select" className="timer-task-label">
+          Vincular tarea
+        </label>
+        <select
+          id="task-select"
+          className="timer-task-select"
+          value={selectedTaskId}
+          onChange={(e) => setSelectedTaskId(e.target.value)}
+          disabled={isLoadingTasks || isCreatingSession || status === "running"}
+        >
+          <option value="">Sin tarea</option>
+          {isLoadingTasks ? (
+            <option disabled>Cargando tareas...</option>
+          ) : activeTasks.length === 0 ? (
+            <option disabled>No hay tareas activas</option>
+          ) : (
+            activeTasks.map((task) => (
+              <option key={task._id} value={task._id}>
+                {task.title} ({task.completedPomodoros}/{" "}
+                {task.estimatedPomodoros})
+              </option>
+            ))
+          )}
+        </select>
       </div>
 
       {/* Círculo de progreso SVG con efecto pulse */}
