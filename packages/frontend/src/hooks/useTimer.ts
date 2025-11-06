@@ -109,6 +109,9 @@ export function useTimer(options: UseTimerOptions = {}) {
    * - Usa sessionService.createSession() para separar lógica de red
    * - Backend calcula puntos según el tipo usando score.ts
    * - Esto gamifica también los descansos (2 puntos break, 5 puntos long_break)
+   * - Envía taskId si está disponible (trabajo vinculado a tarea)
+   * - Backend utilizará taskId para actualizar estado e incrementar pomodoros
+   * - isCreatingSession evita múltiples request simultáneos
    */
   const createSessionInBackend = useCallback(async () => {
     try {
@@ -117,7 +120,7 @@ export function useTimer(options: UseTimerOptions = {}) {
       const session = await sessionService.createSession({
         duration: Math.floor(totalTime / 60), // Convertir segundos a minutos
         type,
-        taskId, // Puede ser undefined si no hay tarea
+        taskId,
       });
 
       setCurrentSessionId(session._id);

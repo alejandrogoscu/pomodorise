@@ -31,15 +31,27 @@ interface ToastNotification {
 }
 
 /*
+ * Props del componente Timer
+ *
+ * Teacher note:
+ * - onPomodoroCompleted: callback cuando se completa un pomodoro work
+ * - Permite al Dashboard refrescar TaskList sin acoplar componentes
+ */
+interface TimerProps {
+  onPomodoroCompleted?: () => void;
+}
+
+/*
  * Componente Timer
  *
  * Teacher note:
  * - Integra callbacks para manejar eventos de sesiones
  * - Muestra feedback visual durante creación de sesión (loading)
  * - Notifica cuando se completa una sesión (puntos, nivel, racha)
- * -  Carga tareas activas para vincular con sesiones
+ * - Carga tareas activas para vincular con sesiones
+ * - Recibe callback para notificar al Dashboard
  */
-function Timer() {
+function Timer({ onPomodoroCompleted }: TimerProps) {
   const { updateUser } = useAuth();
   const [toast, setToast] = useState<ToastNotification | null>(null);
 
@@ -56,44 +68,52 @@ function Timer() {
   const [isLoadingTasks, setIsLoadingTasks] = useState(false);
 
   /*
-   * Carga tareas activas al montar el componente
+   * Carga tareas activas
    *
    * Teacher note:
-   * - Solo cargamos tareas PENDING e IN_PROGRESS
+   * - Extraida a funcion para poder reutilizar después de completar pomodoro
    * - Las tareas completadas no aparecen en el selector
-   * - useEffect con [] se ejecuta solo una vez (al montar)
+   * - Mantiene la tarea seleccionada si sigue activa
+   */
+  const loadActiveTasks = useCallback(async () => {
+    setIsLoadingTasks(true);
+
+    try {
+      const allTasks = await getTasks();
+      const active = allTasks.filter(
+        (task) =>
+          task.status === TaskStatus.PENDING ||
+          task.status === TaskStatus.IN_PROGRESS
+      );
+      setActiveTasks(active);
+
+      // Si la tarea seleccionada ya no está activa (se completó), limpiar selección
+      if (selectedTaskId && !active.find((t) => t._id === selectedTaskId)) {
+        setSelectedTaskId("");
+      }
+    } catch (error) {
+      console.error("Error al cargar tareas:", error);
+      setToast({
+        type: "error",
+        message: "Error al cargar tareas disponibles",
+      });
+    } finally {
+      setIsLoadingTasks(false);
+    }
+  }, [selectedTaskId]);
+
+  /*
+   * Cargar tareas al montar componente
    */
   useEffect(() => {
-    const loadActiveTasks = async () => {
-      setIsLoadingTasks(true);
-      try {
-        // Cargar todas las tareas y filtrar en cliente
-        // (más eficiente que 2 llamadas al backend)
-        const allTasks = await getTasks();
-        const active = allTasks.filter(
-          (task) =>
-            task.status === TaskStatus.PENDING ||
-            task.status === TaskStatus.IN_PROGRESS
-        );
-        setActiveTasks(active);
-      } catch (error) {
-        console.error("Error al cargar tareas:", error);
-        setToast({
-          type: "error",
-          message: "Error al cargar tareas disponibles",
-        });
-      } finally {
-        setIsLoadingTasks(false);
-      }
-    };
-
     loadActiveTasks();
-  }, []);
+  }, [loadActiveTasks]);
 
   /*
    * Callbacks para manejar eventos de sesiones
    *
    * Teacher note:
+   * - Después de completar "work" -> recarga tareas
    * - onComplete: ejecutado cuando se completa una sesión de trabajo
    * - onSessionCreated: ejecutado cuando se crea una sesión en backend
    * - onError: maneja errores de red
@@ -117,6 +137,12 @@ function Timer() {
           type: "success",
           message: `¡Sesión completada! +${result.pointsEarned} puntos. Nivel ${result.user.level} • Racha ${result.user.streak}. ¡Sigue así!`,
         });
+
+        // recargar tareas para actualizar selector
+        loadActiveTasks();
+
+        // Notificar al Dashboard para refrescar TaskList
+        onPomodoroCompleted?.();
       } else if (result.type === "break") {
         setToast({
           type: "info",
@@ -130,7 +156,7 @@ function Timer() {
         });
       }
     },
-    [updateUser]
+    [updateUser, loadActiveTasks, onPomodoroCompleted]
   );
 
   const handleSessionCreated = useCallback((sessionId: string) => {
@@ -213,12 +239,12 @@ function Timer() {
   const getCircleColor = (): string => {
     switch (type) {
       case "work":
-        return "var(--color-primary)";
+        return "var(--color-accent)";
       case "break":
       case "long_break":
-        return "var(--color-success)";
+        return "var(--color-hover)";
       default:
-        return "var(--color-primary)";
+        return "var(--color-accent)";
     }
   };
 

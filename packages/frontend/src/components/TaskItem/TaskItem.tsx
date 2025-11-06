@@ -139,7 +139,7 @@ function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) {
       {/* Contenido principal de la tarea */}
       <div className="task-item-content">
         {/* Título con indicador de prioridad */}
-        <h4 className="task-item title">{task.title}</h4>
+        <h4 className="task-item-title">{task.title}</h4>
         {task.priority !== TaskPriority.MEDIUM && (
           <span className={`task-priority-badge ${getPriorityClass()}`}>
             {task.priority === TaskPriority.HIGH ? "🔴" : "🟢"}

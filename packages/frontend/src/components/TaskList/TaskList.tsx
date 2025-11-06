@@ -7,17 +7,24 @@
  * - Filtros por TaskStatus: pending, in_progress, completed, all
  * - Empty states para UX clara (sin tareas, loading, error)
  * - Usa TaskFilters de shared para mantener coherencia con API
+ * - Expone loadTasks() al Dashboard mediante forwardRef
  *
  * Analogía: TaskList es como un tablero Kanban que organiza tarjetas
  */
 
-import { useState, useEffect } from "react";
 import {
-  ITask,
-  TaskStatus,
-  /* TaskPriority,  */ TaskFilters,
-} from "@pomodorise/shared";
-import { getTasks, deleteTask, updateTaskStatus } from "@/services/taskService";
+  useState,
+  useEffect,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
+import { ITask, TaskStatus } from "@pomodorise/shared";
+import {
+  getTasks,
+  deleteTask,
+  updateTaskStatus,
+} from "../../services/taskService";
 import TaskItem from "../TaskItem/TaskItem";
 import TaskForm from "../TaskForm/TaskForm";
 import "./TaskList.css";
@@ -33,9 +40,25 @@ import "./TaskList.css";
 type UIFilterType = "all" | TaskStatus;
 
 /*
- * Componente TaskList
+ * Métodos expuestos al componente padre (Dashboard)
+ *
+ * Teacher note:
+ * - Permite al Dashboard llamar a loadTasks() imperativamente
+ * - Patrón útil para comunicación entre hermanos vía padre
  */
-function TaskList() {
+export interface TaskListHandle {
+  loadTasks: () => Promise<void>;
+}
+
+/*
+ * Componente TaskList con ref forwarding
+ *
+ * Teacher note:
+ * - forwardRef permite exponer métodos al padre
+ * - useImperativeHandle define qué métodos son públicos
+ * - No recibe props (solo ref), por eso se usa _ para ignorar el parámetro
+ */
+const TaskList = forwardRef<TaskListHandle, unknown>((_props, ref) => {
   // Estado de las tareas
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<ITask[]>([]);
@@ -50,6 +73,39 @@ function TaskList() {
   const [showForm, setShowForm] = useState(false);
 
   /*
+   * Cargar tareas desde el backend
+   *
+   * Teacher note:
+   * - Función extraída para reutilizar desde useEffect y desde ref
+   * - useCallback evita recreación en cada render
+   * - Carga todas las tareas y luego filtra en cliente (listas pequeñas)
+   */
+  const loadTasks = useCallback(async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const fetchedTasks = await getTasks();
+      setTasks(fetchedTasks);
+    } catch (err: any) {
+      console.error("Error al cargar tareas:", err);
+      setError(err.response?.data?.error || "Error al cargar tareas");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  /*
+   * Exponer loadTasks al componente padre
+   *
+   * Teacher note:
+   * - Dashboard puede llamar: taskListRef.current.loadTasks()
+   * - Útil para refrescar tras eventos externos (ej: completar pomodoro)
+   */
+  useImperativeHandle(ref, () => ({
+    loadTasks,
+  }));
+
+  /*
    * Cargar tareas al montar el componente
    *
    * Teacher note:
@@ -58,7 +114,7 @@ function TaskList() {
    */
   useEffect(() => {
     loadTasks();
-  }, []);
+  }, [loadTasks]);
 
   /*
    * Aplicar filtro cuando cambian tareas o filtro activo
@@ -66,70 +122,33 @@ function TaskList() {
    * Teacher note:
    * - useEffect se ejecuta cada vez que tasks o activeFilter cambian
    * - Evita duplicar lógica de filtrado
+   * - Filtramos en cliente para UX más rápida (listas pequeñas)
    */
   useEffect(() => {
-    applyFilter();
-  }, [tasks, activeFilter]);
-
-  /*
-   * Cargar tareas desde la API
-   *
-   * - Teacher note:
-   * - Si activeFilter es 'all', no enviamos filtro (undefined)
-   * - Si es un TaskStatus específico, lo enviamos en el filtro
-   */
-  const loadTasks = async () => {
-    setIsLoading(true);
-    setError("");
-
-    try {
-      // Contruir filtros según activeFilter
-      const filters: TaskFilters | undefined =
-        activeFilter === "all" ? undefined : { status: activeFilter };
-
-      const data = await getTasks(filters);
-      setTasks(data);
-    } catch (err: any) {
-      console.error("Error al cargar tareas:", err);
-      setError("Error al cargar las tareas. Intenta recargar la página");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /*
-   * Aplicar filtro a las tareas (filtrado en cliente)
-   *
-   * Teacher note:
-   * - Este filtrado es redundandte si ya filtramos en el servidor
-   * - OPCIÓN 1: Filtrar solo en servidor (llamar loadTasks() al cambiar filtro)
-   * - OPCIÓN 2: Cargar todas al inicio y filtrar en cliente (actual)
-   * - Para este proyecto usamos OPCIÓN 2 (listas pequeñas, UX más rápida)
-   */
-  const applyFilter = () => {
     if (activeFilter === "all") {
       setFilteredTasks(tasks);
     } else {
       setFilteredTasks(tasks.filter((task) => task.status === activeFilter));
     }
-  };
+  }, [tasks, activeFilter]);
 
   /*
    * Manejar cambio de filtro
    *
    * Teacher note:
-   * - Comentado para usar filtrado en cliente (más rápido para listas pequeñas)
+   * - Solo actualiza el estado local (filtrado en cliente)
+   * - Alternativa: llamar a loadTasks() con filtro en servidor
    */
   const handleFilterChange = (newFilter: UIFilterType) => {
     setActiveFilter(newFilter);
-
-    // OPCION: REcargar desde servidor al cambiar filtro
-    // descomentar si prefieres filtrado en servidor:
-    // loadTasks()
   };
 
   /*
    * Manejar toggle de completado
+   *
+   * Teacher note:
+   * - Actualiza estado en backend y luego en cliente
+   * - Optimistic update: podríamos actualizar UI primero y rollback si falla
    */
   const handleToggleComplete = async (
     taskId: string,
@@ -144,12 +163,16 @@ function TaskList() {
       );
     } catch (err: any) {
       console.error("Error al actualizar tarea:", err);
-      alert("Error al actualizar la tarea. Intenta de nuevo");
+      alert("Error al actualizar la tarea. Intenta de nuevo.");
     }
   };
 
   /*
    * Manejar click en editar
+   *
+   * Teacher note:
+   * - Guarda tarea a editar y muestra formulario
+   * - TaskForm recibe task como prop y se comporta en modo edición
    */
   const handleEdit = (task: ITask) => {
     setEditingTask(task);
@@ -157,7 +180,12 @@ function TaskList() {
   };
 
   /*
-   *Manejar éxito al crear/editar tarea
+   * Manejar éxito al crear/editar tarea
+   *
+   * Teacher note:
+   * - Si editingTask existe → actualizar
+   * - Si no existe → agregar nueva
+   * - Resetea estado de formulario
    */
   const handleTaskSuccess = (task: ITask) => {
     if (editingTask) {
@@ -184,7 +212,12 @@ function TaskList() {
   };
 
   /*
-   * Manejar eleminación de tarea
+   * Manejar eliminación de tarea
+   *
+   * Teacher note:
+   * - Elimina en backend primero
+   * - Luego actualiza estado local
+   * - Sin confirmación (mejora: agregar modal de confirmación)
    */
   const handleDelete = async (taskId: string) => {
     try {
@@ -194,7 +227,7 @@ function TaskList() {
       setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
     } catch (err: any) {
       console.error("Error al eliminar tarea:", err);
-      alert("Error al eliminar la tarea. Intenta de nuevo");
+      alert("Error al eliminar la tarea. Intenta de nuevo.");
     }
   };
 
@@ -238,12 +271,12 @@ function TaskList() {
             className="task-list-new-button"
             onClick={() => setShowForm(true)}
           >
-            + Nueva tarea
+            Nueva tarea
           </button>
         )}
       </div>
 
-      {/* Formulario de creación/edición (condicional)*/}
+      {/* Formulario de creación/edición (condicional) */}
       {showForm && (
         <div className="task-form-wrapper">
           <TaskForm
@@ -297,9 +330,8 @@ function TaskList() {
       {!isLoading && !error && (
         <div className="task-list-content">
           {filteredTasks.length === 0 ? (
-            //Empty state
+            // Empty state
             <div className="task-list-empty">
-              <p className="empty-icon">📝</p>
               <h3>
                 No hay tareas{" "}
                 {activeFilter !== "all" &&
@@ -329,6 +361,8 @@ function TaskList() {
       )}
     </div>
   );
-}
+});
+
+TaskList.displayName = "TaskList";
 
 export default TaskList;

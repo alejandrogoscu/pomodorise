@@ -1,46 +1,27 @@
-/*
- * Estilos para TaskItem
- * 
- * Teacher note:
- * - Diseño de tarjeta con sombra sutil
- * - Estados: normal, hover, completed
- * - Barra de progreso visual para pomodoros
- * - Botones de acción con hover effects
- * - Responsive: stack en móvil si es necesario
- */
-
 .task-item {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
-  padding: 1rem;
-  background: white;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   border-radius: var(--border-radius-md);
-  border: 2px solid var(--color-gray-200);
   transition: all 0.2s;
 }
 
 .task-item:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
 }
 
-/*
- * Estado completado
- * 
- * Teacher note:
- * - Opacidad reducida para indicar "hecho"
- * - Color de fondo sutilmente diferente
- * - Texto tachado en el título
- */
 .task-item-completed {
-  background: var(--color-gray-50);
-  opacity: 0.7;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0.3;
 }
 
 .task-item-completed .task-item-title {
   text-decoration: line-through;
-  color: var(--color-gray-500);
+  color: var(--color-gray-100);
 }
 
 /* ========================================
@@ -50,35 +31,26 @@
 .task-item-checkbox {
   position: relative;
   flex-shrink: 0;
-  margin-top: 0.25rem;
+  margin-top: var(--spacing-md);
 }
 
-/*
- * Custom checkbox styling
- * 
- * Teacher note:
- * - Ocultamos el checkbox nativo (appearance: none)
- * - Creamos uno custom con ::before
- * - Accesibilidad: label asociado con input
- */
 .task-checkbox {
   appearance: none;
   width: 24px;
   height: 24px;
-  border: 2px solid var(--color-gray-300);
-  border-radius: 4px;
+  border: 2px solid var(--color-accent);
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   position: relative;
   transition: all 0.2s;
 }
 
 .task-checkbox:hover {
-  border-color: var(--color-primary);
+  border-color: var(--color-hover);
 }
 
 .task-checkbox:checked {
-  background-color: var(--color-success);
-  border-color: var(--color-success);
+  background-color: var(--color-accent);
 }
 
 .task-checkbox:checked::after {
@@ -87,9 +59,9 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
+  color: var(--color-gray-50);
+  font-size: 16px;
+  font-weight: 800;
 }
 
 .task-checkbox:disabled {
@@ -121,17 +93,17 @@
 
 .task-item-title {
   font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-gray-900);
-  margin: 0 0 0.5rem 0;
+  font-weight: 800;
+  color: var(--color-gray-50);
+  margin: 0 0 var(--spacing-sm) 0;
   word-wrap: break-word;
 }
 
 .task-item-description {
   font-size: 0.875rem;
-  color: var(--color-gray-600);
-  margin: 0 0 0.75rem 0;
-  line-height: 1.4;
+  color: var(--color-gray-100);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: 1.5;
 }
 
 /* ========================================
@@ -141,35 +113,32 @@
 .task-item-progress {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
 }
 
-/*
- * Barra de progreso
- * 
- * Teacher note:
- * - Contenedor gris claro (fondo)
- * - Fill verde que crece según porcentaje
- * - Transición suave al actualizar
- */
 .task-progress-bar {
   flex: 1;
-  height: 6px;
-  background-color: var(--color-gray-200);
-  border-radius: 3px;
+  height: 8px;
+  background-color: var(--color-gray-100);
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .task-progress-fill {
   height: 100%;
-  background-color: var(--color-success);
+  background: linear-gradient(
+    90deg,
+    var(--color-hover) 0%,
+    var(--color-accent) 100%
+  );
   transition: width 0.3s ease;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 .task-progress-text {
   font-size: 0.875rem;
-  color: var(--color-gray-600);
+  color: var(--color-gray-200);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -180,18 +149,10 @@
 
 .task-item-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--spacing-xs);
   flex-shrink: 0;
 }
 
-/*
- * Botones de acción
- * 
- * Teacher note:
- * - Emojis como iconos (simplicidad, accesibilidad)
- * - Hover effect: background + scale
- * - aria-label para screen readers
- */
 .task-action-button {
   width: 32px;
   height: 32px;
@@ -207,7 +168,7 @@
 }
 
 .task-action-button:hover {
-  background-color: var(--color-gray-100);
+  background-color: var(--color-gray-700);
   transform: scale(1.1);
 }
 
@@ -220,7 +181,7 @@
 }
 
 .task-action-delete:hover {
-  background-color: rgba(220, 53, 69, 0.1);
+  background-color: rgba(220, 53, 69, 0.2);
 }
 
 /* ========================================
@@ -230,7 +191,7 @@
 @media (max-width: 480px) {
   .task-item {
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: var(--spacing-sm);
   }
 
   .task-item-content {
