@@ -18,20 +18,9 @@ import {
   ReactNode,
   useCallback,
 } from "react";
-
-/*
- * Tipo para una notificación Toast individual
- *
- * Teacher note:
- * - id único para poder eliminar toasts específicos
- * - type determina color y estilo
- * - message es el texto a mostrar
- */
-export interface ToastNotification {
-  id: string;
-  message: string;
-  type: "success" | "error" | "info";
-}
+import ToastContainer, {
+  ToastNotification,
+} from "../components/Toast/ToastContainer";
 
 /*
  * Tipo del contexto
@@ -71,13 +60,6 @@ export const useToast = (): ToastContextType => {
 };
 
 /*
- * Props del ToastProvider
- */
-interface ToastProviderProps {
-  children: ReactNode;
-}
-
-/*
  * ToastProvider - Proveedor del contexto
  *
  * Teacher note:
@@ -86,7 +68,7 @@ interface ToastProviderProps {
  * - removeToasts elimina toast por ID
  * - Auto-dismiss con setTimeout (5s por defecto)
  */
-export const ToastProvider = ({ children }: ToastProviderProps) => {
+export const ToastProvider = ({ children }: { children: ReactNode }) => {
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
 
   /*
@@ -139,46 +121,5 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
       {/* ToastContainer renderizara los toasts */}
       <ToastContainer toasts={toasts} onClose={removeToasts} />
     </ToastContext.Provider>
-  );
-};
-
-/*
- * ToastContainer - Renderiza stack de toast
- *
- * Teacher note:
- * - Se renderiza en el root de la app (fuera de containers)
- * - position: fixed se posiciona relativo al viewport (siempre top-rigth)
- * - Stack vertical con gap entre toasts
- */
-interface ToastContainerProps {
-  toasts: ToastNotification[];
-  onClose: (id: string) => void;
-}
-
-const ToastContainer = ({ toasts, onClose }: ToastContainerProps) => {
-  // Este componente se moverá a archivo separado en próxima subfase
-  // Por ahora, importamos Toast aquí
-  const Toast = ({ message, type, onClose }: any) => (
-    <div className={`toast toast-${type}`} role="alert">
-      <span className="toast-message">{message}</span>
-      <button className="toast-close" onClick={onClose} aria-label="Cerrar">
-        x
-      </button>
-    </div>
-  );
-
-  if (toasts.length === 0) return null;
-
-  return (
-    <div className="toast-container">
-      {toasts.map((toast) => (
-        <Toast
-          key={toast.id}
-          message={toast.message}
-          type={toast.type}
-          onClose={() => onClose(toast.id)}
-        />
-      ))}
-    </div>
   );
 };
