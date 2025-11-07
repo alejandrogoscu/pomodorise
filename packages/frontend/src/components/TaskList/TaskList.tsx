@@ -27,7 +27,7 @@ import {
 } from "../../services/taskService";
 import TaskItem from "../TaskItem/TaskItem";
 import TaskForm from "../TaskForm/TaskForm";
-import Toast from "../Toast/Toast";
+import { useToast } from "../../context/ToastContext";
 import "./TaskList.css";
 
 /*
@@ -39,18 +39,6 @@ import "./TaskList.css";
  * - Separamos el tipo de UI del tipo de API
  */
 type UIFilterType = "all" | TaskStatus;
-
-/*
- * Tipo para notificaciones Toast
- *
- * Teacher note:
- * - type: determina color y estilo del Toast
- * - message: texto a mostrar al usuario
- */
-interface ToastNotification {
-  message: string;
-  type: "success" | "error" | "info";
-}
 
 /*
  * Métodos expuestos al componente padre (Dashboard)
@@ -96,8 +84,7 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
     const [editingTask, setEditingTask] = useState<ITask | null>(null);
     const [showForm, setShowForm] = useState(false);
 
-    // Estado para Toast (NUEVO)
-    const [toast, setToast] = useState<ToastNotification | null>(null);
+    const { showToast } = useToast();
 
     /*
      * Cargar tareas desde el backend
@@ -184,12 +171,11 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
         console.error("Error al actualizar tarea:", err);
 
         // ❌ Mostrar Toast de error en lugar de alert()
-        setToast({
-          type: "error",
-          message:
-            err.response?.data?.error ||
+        showToast(
+          err.response?.data?.error ||
             "Error al actualizar la tarea. Intenta de nuevo.",
-        });
+          "error"
+        );
       }
     };
 
@@ -251,20 +237,16 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
         onTaskChange?.();
 
         // 🎉 Mostrar Toast de éxito
-        setToast({
-          type: "success",
-          message: `Tarea "${taskTitle}" eliminada correctamente`,
-        });
+        showToast(`Tarea "${taskTitle}" eliminada correctamente`, "success");
       } catch (err: any) {
         console.error("Error al eliminar tarea:", err);
 
         // ❌ Mostrar Toast de error
-        setToast({
-          type: "error",
-          message:
-            err.response?.data?.error ||
+        showToast(
+          err.response?.data?.error ||
             "Error al eliminar la tarea. Intenta de nuevo.",
-        });
+          "error"
+        );
       }
     };
 
@@ -296,15 +278,6 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
 
     return (
       <div className="task-list-container">
-        {/* Notificación Toast (NUEVO) */}
-        {toast && (
-          <Toast
-            message={toast.message}
-            type={toast.type}
-            onClose={() => setToast(null)}
-          />
-        )}
-
         {/* Header con botón de nueva tarea */}
         <div className="task-list-header">
           <h2 className="task-list-title">Mis Tareas</h2>

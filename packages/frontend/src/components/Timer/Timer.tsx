@@ -26,16 +26,8 @@ import { useAuth } from "../../context/AuthContext";
 import { formatTime, calculateProgress } from "../../utils/timeFormat";
 import { getTasks } from "../../services/taskService";
 import { ITask, TaskStatus } from "@pomodorise/shared";
-import Toast from "../Toast/Toast";
+import { useToast } from "../../context/ToastContext";
 import "./Timer.css";
-
-/*
- * Tipo para notificaciones Toast
- */
-interface ToastNotification {
-  message: string;
-  type: "success" | "error" | "info";
-}
 
 /*
  * Props del componente Timer
@@ -69,7 +61,7 @@ export interface TimerHandle {
 const Timer = forwardRef<TimerHandle, TimerProps>(
   ({ onPomodoroCompleted }, ref) => {
     const { updateUser } = useAuth();
-    const [toast, setToast] = useState<ToastNotification | null>(null);
+    const { showToast } = useToast();
 
     /*
      * Estado para selector de tareas
@@ -109,14 +101,12 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
         }
       } catch (error) {
         console.error("Error al cargar tareas:", error);
-        setToast({
-          type: "error",
-          message: "Error al cargar tareas disponibles",
-        });
+
+        showToast("Error al cargar tareas disponibles", "error");
       } finally {
         setIsLoadingTasks(false);
       }
-    }, [selectedTaskId]);
+    }, [selectedTaskId, showToast]);
 
     /*
      * Exponer loadActiveTasks al Dashboard
@@ -160,10 +150,10 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
 
         // Mostrar notificación según tipo de sesión
         if (result.type === "work") {
-          setToast({
-            type: "success",
-            message: `¡Sesión completada! +${result.pointsEarned} puntos. Nivel ${result.user.level} • Racha ${result.user.streak}. ¡Sigue así!`,
-          });
+          showToast(
+            `¡Sesión completada! +${result.pointsEarned} puntos. Nivel ${result.user.level} • Racha ${result.user.streak}. ¡Sigue así!`,
+            "success"
+          );
 
           // recargar tareas para actualizar selector
           loadActiveTasks();
@@ -171,32 +161,32 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
           // Notificar al Dashboard para refrescar TaskList
           onPomodoroCompleted?.();
         } else if (result.type === "break") {
-          setToast({
-            type: "info",
-            message: `¡Descanso corto completado! +${result.pointsEarned} puntos.`,
-          });
+          showToast(
+            `¡Descanso corto completado! +${result.pointsEarned} puntos.`,
+            "info"
+          );
         } else {
           // Long_break
-          setToast({
-            type: "info",
-            message: `¡Descanso largo completado! +${result.pointsEarned} puntos. ¡Excelente trabajo!`,
-          });
+          showToast(
+            `¡Descanso largo completado! +${result.pointsEarned} puntos. ¡Excelente trabajo!`,
+            "info"
+          );
         }
       },
-      [updateUser, loadActiveTasks, onPomodoroCompleted]
+      [updateUser, loadActiveTasks, onPomodoroCompleted, showToast]
     );
 
     const handleSessionCreated = useCallback((sessionId: string) => {
       console.log("Sesión creada:", sessionId);
     }, []);
 
-    const handleError = useCallback((error: Error) => {
-      console.error("❌ Error en sesión:", error.message);
-      setToast({
-        type: "error",
-        message: `Error: ${error.message}`,
-      });
-    }, []);
+    const handleError = useCallback(
+      (error: Error) => {
+        console.error("❌ Error en sesión:", error.message);
+        showToast(`Error: ${error.message}`, "error");
+      },
+      [showToast]
+    );
 
     /*
      * Inicializar hook con callbacks y taskId seleccionado
@@ -286,15 +276,6 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
 
     return (
       <div className="timer-container">
-        {/* Notificación Toast */}
-        {toast && (
-          <Toast
-            message={toast.message}
-            type={toast.type}
-            onClose={() => setToast(null)}
-          />
-        )}
-
         {/* Header con tipo de sesión y contador de pomodoros */}
         <div className="timer-header">
           <h2 className="timer-type">{getTypeLabel()}</h2>
