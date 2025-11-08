@@ -118,17 +118,17 @@ function Modal({ isOpen, onClose, children, title }: ModalProps) {
   return createPortal(
     <div className="modal-backdrop" onClick={handleBackdropClick}>
       <div className="modal-container" ref={modalRef}>
+        <button
+          className="modal-close-button"
+          onClick={onClose}
+          aria-label="Cerrar modal"
+        >
+          x
+        </button>
         {/* Header opcional con título y botón cerrar */}
         {title && (
           <div className="modal-header">
             <h2 className="modal-title">{title}</h2>
-            <button
-              className="modal-close-button"
-              onClick={onClose}
-              aria-label="Cerrar modal"
-            >
-              x
-            </button>
           </div>
         )}
 
