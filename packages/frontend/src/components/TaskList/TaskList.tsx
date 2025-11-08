@@ -27,6 +27,7 @@ import {
 } from "../../services/taskService";
 import TaskItem from "../TaskItem/TaskItem";
 import TaskForm from "../TaskForm/TaskForm";
+import Modal from "../Modal/Modal";
 import { useToast } from "../../context/ToastContext";
 import "./TaskList.css";
 
@@ -80,7 +81,7 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
     const [error, setError] = useState("");
     const [activeFilter, setActiveFilter] = useState<UIFilterType>("all");
 
-    // Estado de edición
+    // Estado de edición y modal
     const [editingTask, setEditingTask] = useState<ITask | null>(null);
     const [showForm, setShowForm] = useState(false);
 
@@ -188,6 +189,14 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
     };
 
     /*
+     * manejar click en Nueva tarea
+     */
+    const handleNewtask = () => {
+      setEditingTask(null);
+      setShowForm(true);
+    };
+
+    /*
      * Manejar éxito al crear/editar tarea
      */
     const handleTaskSuccess = (task: ITask) => {
@@ -281,26 +290,23 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
         {/* Header con botón de nueva tarea */}
         <div className="task-list-header">
           <h2 className="task-list-title">Mis Tareas</h2>
-          {!showForm && (
-            <button
-              className="task-list-new-button"
-              onClick={() => setShowForm(true)}
-            >
-              + Nueva tarea
-            </button>
-          )}
+          <button className="task-list-new-button" onClick={handleNewtask}>
+            + Nueva tarea
+          </button>
         </div>
 
-        {/* Formulario de creación/edición (condicional) */}
-        {showForm && (
-          <div className="task-form-wrapper">
-            <TaskForm
-              task={editingTask || undefined}
-              onSuccess={handleTaskSuccess}
-              onCancel={handleCancelForm}
-            />
-          </div>
-        )}
+        {/* Modal con TaskForm*/}
+        <Modal
+          isOpen={showForm}
+          onClose={handleCancelForm}
+          title={editingTask ? "Editar tarea" : "Nueva tarea"}
+        >
+          <TaskForm
+            task={editingTask || undefined}
+            onSuccess={handleTaskSuccess}
+            onCancel={handleCancelForm}
+          />
+        </Modal>
 
         {/* Filtros */}
         <div className="task-list-filters">
