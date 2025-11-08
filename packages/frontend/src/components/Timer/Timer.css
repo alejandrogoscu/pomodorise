@@ -284,6 +284,16 @@
 /* ========================================
    RESPONSIVE
    ======================================== */
+@media (max-width: 890px) {
+  .timer-type {
+    font-size: 1.25rem;
+  }
+
+  .timer-pomodoros {
+    font-size: 0.875rem;
+  }
+}
+
 @media (max-width: 480px) {
   .timer-container {
     padding: var(--spacing-md);
