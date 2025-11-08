@@ -347,7 +347,6 @@ const TaskList = forwardRef<TaskListHandle, TaskListProps>(
             {filteredTasks.length === 0 ? (
               // Empty state
               <div className="task-list-empty">
-                <p className="empty-icon">📝</p>
                 <h3>
                   No hay tareas{" "}
                   {activeFilter !== "all" &&

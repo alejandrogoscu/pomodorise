@@ -168,6 +168,10 @@
  * Empty state
 */
 
+.task-list-empty {
+  margin: 0 auto;
+}
+
 .task-list-empty h3 {
   font-size: 1.25rem;
   color: var(--color-gray-100);
@@ -185,9 +189,12 @@
    ======================================== */
 
 .task-list-content {
-  flex: 1;
+  height: 400px;
+  max-height: 400px;
   overflow-y: auto;
   padding-right: var(--spacing-xs);
+  transition: padding-right 0.2s;
+  display: flex;
 }
 
 /* Scrollbar personalizada para mantener coherencia */
@@ -201,18 +208,20 @@
 }
 
 .task-list-content::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--color-accent);
   border-radius: 3px;
 }
 
 .task-list-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--color-hover);
 }
 
 .task-list-items {
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
 }
 
 /* ========================================
@@ -241,5 +250,9 @@
   .filter-button {
     flex: 1 1 calc(50% - var(--spacing-xs));
     min-width: 120px;
+  }
+
+  .task-list-content {
+    max-height: 350px;
   }
 }
