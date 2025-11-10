@@ -272,6 +272,21 @@ export const updateTask = async (
 
     const updates: UpdateTaskDTO = req.body;
 
+    // Si se actualiza estimatedPomodoros, validar y pasear
+    if (updates.estimatedPomodoros !== undefined) {
+      try {
+        updates.estimatedPomodoros = validateAndParsePomodoros(
+          updates.estimatedPomodoros,
+          "estimatedPomodoros"
+        );
+      } catch (validationError: any) {
+        res.status(400).json({
+          error: validationError.message,
+        });
+        return;
+      }
+    }
+
     // Buscar y actualizar solo si pertenece al usuario
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, userId: req.user._id },

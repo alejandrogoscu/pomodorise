@@ -20,13 +20,11 @@ import "./StatsCard.css";
  * - icon: emoji o carácter para representar visualmente la métrica
  * - label: descripción de la métrica ("Total sesiones", "Puntos ganados")
  * - value: número a mostrar
- * - color: clase CSS para el color del borde/icono (opcional)
  */
 interface StatsCardProps {
   icon: string;
   label: string;
   value: number | string;
-  color?: "primary" | "success" | "warning" | "info";
 }
 
 /*
@@ -48,9 +46,9 @@ interface StatsCardProps {
  * - El color se aplica como clase CSS para personalización
  * - Puede recibir números o strings (útil para "N/A" si no hay datos)
  */
-function StatsCard({ icon, label, value, color = "primary" }: StatsCardProps) {
+function StatsCard({ icon, label, value }: StatsCardProps) {
   return (
-    <div className={`stats-card stats-card-${color}`}>
+    <div className="stats-card">
       {/* Icono visual */}
       <div className="stats-card-icon">{icon}</div>
 
