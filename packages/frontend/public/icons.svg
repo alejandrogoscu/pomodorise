@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+
+  <!-- NIVEL -->
+  <symbol id="icon-level" viewBox="0 0 24 24" fill="var(--color-accent)">
+    <path d="M12 2L4 5v6c0 5.25 3.44 10.74 8 11.99 4.56-1.25 8-6.74 8-11.99V5l-8-3zM12 19.5c-3.31-1-6-5.01-6-8.5V6.3l6-2.25 6 2.25V11c0 3.49-2.69 7.5-6 8.5z"/>
+  </symbol>
+
+  <!-- PUNTOS -->
+  <symbol id="icon-points" viewBox="0 0 24 24" fill="var(--color-accent)">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+  </symbol>
+
+  <!-- RACHA -->
+  <symbol id="icon-streak" viewBox="0 0 24 24" fill="var(--color-accent)">
+    <path d="M12 2C10 5 6 8 6 13a6 6 0 0012 0c0-3-1.5-5-3-6.5.2 1.5-.5 3-1.5 4.2C11 9 11 6 12 2z"/>
+  </symbol>
+
+  <!-- EDITAR -->
+  <symbol id="icon-edit" viewBox="0 0 24 24" fill="var(--color-accent)">
+    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM21.41 6.34l-3.75-3.75-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+  </symbol>
+
+  <!-- BORRAR -->
+  <symbol id="icon-delete" viewBox="0 0 24 24" fill="var(--color-accent)">
+    <path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+  </symbol>
+
+  <!-- TOTAL SESIONES -->
+  <symbol id="icon-sessions" viewBox="0 0 24 24" fill="var(--color-accent)">
+    <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 16H5V10h14v10z"/>
+  </symbol>
+
+  <!-- MINUTOS TOTALES  -->
+  <symbol id="icon-minutes" viewBox="0 0 24 24" fill="var(--color-accent)">
+    <path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2zm.5 10.5V7h-1v6l3 1.5.5-.9-2.5-1.1z"/>
+  </symbol>
+
+  <!-- POMODOROS -->
+  <symbol id="icon-pomodoros" viewBox="0 0 24 24" fill="var(--color-accent)">
+    <path d="M12 2a10 10 0 1010 10H12V2zm-1 10H2a10 10 0 0010 10v-10z"/>
+  </symbol>
+
+</svg>

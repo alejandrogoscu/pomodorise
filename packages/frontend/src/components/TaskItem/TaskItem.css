@@ -153,8 +153,8 @@
 }
 
 .task-action-button {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border: none;
   background: transparent;
   border-radius: var(--border-radius-sm);
@@ -164,23 +164,24 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  padding: 0;
+}
+
+.task-action-button svg {
+  display: block;
+  flex-shrink: 0;
 }
 
 .task-action-button:hover {
-  background-color: var(--color-gray-700);
-  transform: scale(1.1);
+  transform: scale(1.4);
 }
 
 .task-action-button:active {
   transform: scale(0.95);
 }
 
-.task-action-edit:hover {
-  background-color: rgba(102, 126, 234, 0.1);
-}
-
 .task-action-delete:hover {
-  background-color: rgba(220, 53, 69, 0.2);
+  background-color: red;
 }
 
 /* ========================================

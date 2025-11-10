@@ -90,19 +90,31 @@ function UserProfile() {
       {/* Estadísticas: nivel, puntos, racha */}
       <div className="user-profile-stats">
         <div className="user-profile-stat">
-          <span className="user-profile-stat-icon">🏆</span>
+          <span className="user-profile-stat-icon">
+            <svg width={32} height={32} fill="var(--color-accent)">
+              <use href="/icons.svg#icon-level" />
+            </svg>
+          </span>
           <span className="user-profile-stat-label">Nivel</span>
           <span className="user-profile-stat-value">{user.level}</span>
         </div>
 
         <div className="user-profile-stat">
-          <span className="user-profile-stat-icon">⭐</span>
+          <span className="user-profile-stat-icon">
+            <svg width={32} height={32} fill="var(--color-accent)">
+              <use href="/icons.svg#icon-points" />
+            </svg>
+          </span>
           <span className="user-profile-stat-label">Puntos</span>
           <span className="user-profile-stat-value">{user.points}</span>
         </div>
 
         <div className="user-profile-stat">
-          <span className="user-profile-stat-icon">🔥</span>
+          <span className="user-profile-stat-icon">
+            <svg width={32} height={32} fill="var(--color-accent)">
+              <use href="/icons.svg#icon-streak" />
+            </svg>
+          </span>
           <span className="user-profile-stat-label">Racha</span>
           <span className="user-profile-stat-value">{user.streak}</span>
         </div>

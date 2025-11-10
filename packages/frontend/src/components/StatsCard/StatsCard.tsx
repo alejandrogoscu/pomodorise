@@ -50,7 +50,16 @@ function StatsCard({ icon, label, value }: StatsCardProps) {
   return (
     <div className="stats-card">
       {/* Icono visual */}
-      <div className="stats-card-icon">{icon}</div>
+      <span className="stats-card-icon">
+        <svg
+          width={32}
+          height={32}
+          fill="var(--color-accent)"
+          aria-hidden="true"
+        >
+          <use href={`/icons.svg#${icon}`} />
+        </svg>
+      </span>
 
       {/* Contenido */}
       <div className="stats-card-content">

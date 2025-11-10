@@ -105,17 +105,17 @@ const Dashboard = () => {
           ) : stats ? (
             <>
               <StatsCard
-                icon="🎯"
+                icon="icon-sessions"
                 label="Total sesiones"
                 value={stats.totalSessions}
               />
               <StatsCard
-                icon="⏱️"
+                icon="icon-minutes"
                 label="Minutos totales"
                 value={stats.totalMinutes}
               />
               <StatsCard
-                icon="⏲️"
+                icon="icon-pomodoros"
                 label="Pomodoros"
                 value={stats.completedPomodoros}
               />

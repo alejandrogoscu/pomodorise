@@ -172,7 +172,14 @@ function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) {
             title="Editar tarea"
             aria-label="Editar tarea"
           >
-            ✏️
+            <svg
+              width={22}
+              height={22}
+              fill="var(--color-accent)"
+              aria-hidden="true"
+            >
+              <use href="/icons.svg#icon-edit" />
+            </svg>
           </button>
         )}
 
@@ -183,7 +190,14 @@ function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) {
             title="Eliminar tarea"
             aria-label="Eliminar tarea"
           >
-            🗑️
+            <svg
+              width={22}
+              height={22}
+              fill="var(--color-accent)"
+              aria-hidden="true"
+            >
+              <use href="/icons.svg#icon-delete" />
+            </svg>
           </button>
         )}
       </div>
