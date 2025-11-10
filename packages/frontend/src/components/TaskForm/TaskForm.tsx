@@ -31,7 +31,7 @@ interface TasksFormProps {
 }
 
 /*
- * Límite de caracteres para descripción
+ * Límite de caracteres para descripción y Limite  pomodoros
  *
  * Teacher note:
  * - Calculado para ~3-4 líneas de texto (80px de altura)
@@ -39,6 +39,8 @@ interface TasksFormProps {
  * - 200 caracteres = ~4 líneas cómodas
  */
 const MAX_DESCRIPTION_LENGTH = 200;
+const MIN_POMODOROS = 1;
+const MAX_POMORODOS = 20;
 
 /*
  * Componente TaskForm
@@ -63,7 +65,7 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
   const [title, setTitle] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
   const [estimatedPomodoros, setEstimatedPomodoros] = useState(
-    task?.estimatedPomodoros || 1
+    task?.estimatedPomodoros.toString() || "1"
   );
 
   // Estado de UI
@@ -87,7 +89,7 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
     if (task) {
       setTitle(task.title);
       setDescription(task.description || "");
-      setEstimatedPomodoros(task.estimatedPomodoros);
+      setEstimatedPomodoros(task.estimatedPomodoros.toString());
     }
   }, [task]);
 
@@ -117,6 +119,30 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
   };
 
   /*
+   * Validar input de pomodoros (solo números)
+   *
+   * Teacher note:
+   * - Acepta solo dígitos (regex /^\d*$/)
+   * - Permite string vacío temporalmente (validación al submit)
+   * - Bloquea letras, símbolos, decímales
+   */
+  const handlePomodorosChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (value === "" || /^\d+$/.test(value)) {
+      const numValue = parseInt(value, 10);
+
+      if (!isNaN(numValue)) {
+        if (numValue <= MAX_POMORODOS) {
+          setEstimatedPomodoros(value);
+        }
+      } else {
+        setEstimatedPomodoros(value);
+      }
+    }
+  };
+
+  /*
    * Validar campos del formulario
    *
    * Teacher note:
@@ -135,10 +161,14 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
     }
 
     // Validara pomodoros estimados
-    if (estimatedPomodoros < 1) {
-      errors.estimatedPomodoros = "Mínimo 1 pomodoro";
-    } else if (estimatedPomodoros > 20) {
-      errors.estimatedPomodoros = "Máximo 20 pomodoros";
+    const pomodorosNum = parseInt(estimatedPomodoros, 10);
+
+    if (estimatedPomodoros === "" || isNaN(pomodorosNum)) {
+      errors.estimatedPomodoros = "Los pomodoros estimados son obligatorios";
+    } else if (pomodorosNum < MIN_POMODOROS) {
+      errors.estimatedPomodoros = `Mínimo ${MIN_POMODOROS} pomodoro`;
+    } else if (pomodorosNum > MAX_POMORODOS) {
+      errors.estimatedPomodoros = `Máximo ${MAX_POMORODOS} pomodoros`;
     }
 
     setFieldErrors(errors);
@@ -168,6 +198,7 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
     setIsLoading(true);
 
     try {
+      const pomodorosNum = parseInt(estimatedPomodoros, 10);
       let savedTask: ITask;
 
       if (isEditMode && task) {
@@ -175,8 +206,8 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
         const updates: UpdateTaskDTO = {};
         if (title !== task.title) updates.title = title;
         if (description !== task.description) updates.description = description;
-        if (estimatedPomodoros !== task.estimatedPomodoros) {
-          updates.estimatedPomodoros = estimatedPomodoros;
+        if (pomodorosNum !== task.estimatedPomodoros) {
+          updates.estimatedPomodoros = pomodorosNum;
         }
 
         savedTask = await updateTask(task._id, updates);
@@ -185,7 +216,7 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
         const newTaskData: CreateTaskDTO = {
           title: title.trim(),
           description: description.trim() || undefined,
-          estimatedPomodoros,
+          estimatedPomodoros: pomodorosNum,
         };
 
         savedTask = await createTask(newTaskData);
@@ -194,7 +225,7 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
       // Éxito: limpiar formulario y llamar callback
       setTitle("");
       setDescription("");
-      setEstimatedPomodoros(1);
+      setEstimatedPomodoros("1");
       onSuccess(savedTask);
     } catch (err: any) {
       console.error("Error al guardar tarea:", err);
@@ -219,7 +250,7 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
     // Limpiar formulario
     setTitle("");
     setDescription("");
-    setEstimatedPomodoros(1);
+    setEstimatedPomodoros("1");
     setError("");
     setFieldErrors({});
 
@@ -300,15 +331,17 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
           </label>
           <input
             id="task-pomodoros"
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             className={`form-input ${
               fieldErrors.estimatedPomodoros ? "error" : ""
             }`}
+            placeholder={`Entre ${MIN_POMODOROS} y ${MAX_POMORODOS}`}
             value={estimatedPomodoros}
-            onChange={(e) => setEstimatedPomodoros(Number(e.target.value))}
+            onChange={handlePomodorosChange}
             disabled={isLoading}
-            min={1}
-            max={20}
+            autoComplete="off"
           />
           {fieldErrors.estimatedPomodoros && (
             <span className="form-error">{fieldErrors.estimatedPomodoros}</span>

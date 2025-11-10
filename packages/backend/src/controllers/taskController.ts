@@ -15,6 +15,60 @@ import { AuthRequest } from "./authController";
 import { CreateTaskDTO, UpdateTaskDTO, TaskStatus } from "@pomodorise/shared";
 
 /*
+ * Constantes de validación
+ *
+ * Teacher note:
+ * - Centralizadas para fácil modificación
+ * - Coherentes con frontend (MIN_POMODOROS, MAX_POMODOROS)
+ */
+const MIN_POMODOROS = 1;
+const MAX_POMODOROS = 20;
+
+/*
+ * Función auxiliar para validar y parsear pomodoros
+ *
+ * Teacher note:
+ * - Acepta string (del frontend) o number (por retrocompatibilidad)
+ * - Valida rango y tipo
+ * - Devuelve número válido o lanza error descriptivo
+ *
+ * @param value - valor a validar (string | number)
+ * @param fieldName - nombre del campo para mensaje de error
+ * @throw Error si valor inválido
+ * @returns number validado
+ */
+function validateAndParsePomodoros(
+  value: any,
+  fieldName: string = "estimatedPomodoros"
+): number {
+  const numValue = typeof value === "string" ? parseInt(value, 10) : value;
+
+  if (typeof numValue !== "number" || isNaN(numValue)) {
+    throw new Error(
+      `${fieldName} debe ser un número válido (recibido: ${typeof value})`
+    );
+  }
+
+  if (!Number.isInteger(numValue)) {
+    throw new Error(`${fieldName} debe ser un número entero`);
+  }
+
+  if (numValue < MIN_POMODOROS) {
+    throw new Error(
+      `${fieldName} debe ser al menos ${MIN_POMODOROS} (recibido: ${numValue})`
+    );
+  }
+
+  if (numValue > MAX_POMODOROS) {
+    throw new Error(
+      `${fieldName} no puede exceder ${MAX_POMODOROS} (recibido: ${numValue})`
+    );
+  }
+
+  return numValue;
+}
+
+/*
  * GET /api/tasks
  * Obtiene todas las tareas del usuario autenticado
  *
@@ -144,9 +198,36 @@ export const createTask = async (
       return;
     }
 
+    if (taskData.estimatedPomodoros === undefined) {
+      res.status(400).json({
+        error: 'El campo "estimatedPomodoros" es obligatorio',
+      });
+      return;
+    }
+
+    /*
+     * Validar y parsear estimatedPomodoros
+     */
+    let validatedPomodoros: number;
+    try {
+      validatedPomodoros = validateAndParsePomodoros(
+        taskData.estimatedPomodoros,
+        "estimatedPomodoros"
+      );
+    } catch (validationError: any) {
+      res.status(400).json({
+        error: validationError.message,
+      });
+      return;
+    }
+
     // Crea tarea asociada al usuario autenticado
     const task = await Task.create({
-      ...taskData,
+      title: taskData.title.trim(),
+      description: taskData.description?.trim(),
+      priority: taskData.priority,
+      estimatedPomodoros: validatedPomodoros,
+      dueDate: taskData.dueDate,
       userId: req.user._id,
       status: TaskStatus.PENDING,
       completedPomodoros: 0,
