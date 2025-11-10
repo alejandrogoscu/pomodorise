@@ -92,7 +92,7 @@ function SessionsChart({ data }: SessionsChartProps) {
     <div className="sessions-chart">
       {/* Header del gráfico */}
       <div className="sessions-chart-header">
-        <h3 className="sessions-chart-title">📊 Sesiones por día</h3>
+        <h3 className="sessions-chart-title">Sesiones por día</h3>
         <p className="sessions-chart-subtitle">
           Últimos {data.length} días con actividad
         </p>
@@ -120,12 +120,13 @@ function SessionsChart({ data }: SessionsChartProps) {
             stroke="rgba(255,255,255,0.7)"
             style={{ fontSize: "0.875rem" }}
             allowDecimals={false}
+            domain={["dataMin", (dataMax) => dataMax + 1]}
           />
 
           {/* Tooltip al pasar el mouse */}
           <Tooltip
             contentStyle={{
-              backgroundColor: "rgba(255,255,255,0.95)",
+              backgroundColor: "rgba(0,0,0,0.6)",
               border: "none",
               borderRadius: "var(--border-radius-md)",
               boxShadow: "var(--shadow-md)",
