@@ -11,7 +11,7 @@
  * que validas antes de enviar al departamento correspondiente
  */
 
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent, useEffect, ChangeEvent } from "react";
 import { ITask, CreateTaskDTO, UpdateTaskDTO } from "@pomodorise/shared";
 import { createTask, updateTask } from "../../services/taskService";
 import "./TaskForm.css";
@@ -29,6 +29,16 @@ interface TasksFormProps {
   onSuccess: (task: ITask) => void; // Callback después de crear/editar
   onCancel?: () => void; // Callback para cancelar
 }
+
+/*
+ * Límite de caracteres para descripción
+ *
+ * Teacher note:
+ * - Calculado para ~3-4 líneas de texto (80px de altura)
+ * - Aproximadamente 15-20 caracteres por línea
+ * - 200 caracteres = ~4 líneas cómodas
+ */
+const MAX_DESCRIPTION_LENGTH = 200;
 
 /*
  * Componente TaskForm
@@ -80,6 +90,31 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
       setEstimatedPomodoros(task.estimatedPomodoros);
     }
   }, [task]);
+
+  /*
+   * Manejar cambio en textarea con validaciones
+   *
+   * Teacher note:
+   * - Limita caracteres al máximo definido
+   * - Previene tabs excesivos (máximo 2 consecutivos)
+   * - Reemplaza múltiples espacios por uno solo
+   */
+  const HandleDescriptionChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    let value = e.target.value;
+
+    // Limitar a MAX_DESCRIPTION_LENGTH caracteres
+    if (value.length > MAX_DESCRIPTION_LENGTH) {
+      value = value.slice(0, MAX_DESCRIPTION_LENGTH);
+    }
+
+    // Prevenir tabs excesivos (máximo 2 tabs consecutivos)
+    value = value.replace(/\t{3,}/g, "\t\t");
+
+    // Remplazar múltiples espacios por uno solo
+    value = value.replace(/  +/g, " ");
+
+    setDescription(value);
+  };
 
   /*
    * Validar campos del formulario
@@ -194,6 +229,15 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
     }
   };
 
+  /*
+   * Determinar si se acerca al límite
+   *
+   * Teacher note:
+   * - Feedback visual para usuario
+   * - Cambia color del contador a warning
+   */
+  const isNearLimit = description.length > MAX_DESCRIPTION_LENGTH * 0.8;
+
   return (
     <div className="task-form-container">
       <h3 className="task-form-title">
@@ -224,21 +268,29 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
           )}
         </div>
 
-        {/* Campo Descripción (opcional) */}
+        {/* Campo Descripción (opcional) con contador */}
         <div className="form-group">
           <label htmlFor="task-description" className="form-label">
             Descripción (opcional)
           </label>
-          <textarea
-            id="task-description"
-            className="form-textarea"
-            placeholder="Añade detalles sobre la tarea..."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            disabled={isLoading}
-            rows={3}
-            maxLength={500}
-          />
+          <div className="textarea-wrapper">
+            <textarea
+              id="task-description"
+              className="form-textarea"
+              placeholder="Añade detalles sobre la tarea..."
+              value={description}
+              onChange={HandleDescriptionChange}
+              disabled={isLoading}
+              rows={3}
+              maxLength={MAX_DESCRIPTION_LENGTH}
+            />
+            {/* Contador de caracteres */}
+            <span
+              className={`textarea-counter ${isNearLimit ? "warning" : ""}`}
+            >
+              {description.length}/{MAX_DESCRIPTION_LENGTH}
+            </span>
+          </div>
         </div>
 
         {/* Campo Pomodoros estimados */}
