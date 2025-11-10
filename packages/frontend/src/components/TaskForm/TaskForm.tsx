@@ -108,7 +108,7 @@ function TaskForm({ task, onSuccess, onCancel }: TasksFormProps) {
     }
 
     // Prevenir tabs excesivos (máximo 2 tabs consecutivos)
-    value = value.replace(/\t{3,}/g, "\t\t");
+    value = value.replace(/\n{3,}/g, "\n\n");
 
     // Remplazar múltiples espacios por uno solo
     value = value.replace(/  +/g, " ");
