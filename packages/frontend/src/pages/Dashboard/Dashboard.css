@@ -113,7 +113,14 @@
 .dashboard-grid-stats {
   grid-area: stats;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  background: linear-gradient(
+    45deg,
+    var(--color-secondary) 0%,
+    var(--color-primary) 100%
+  );
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
   gap: var(--spacing-lg);
 }
 

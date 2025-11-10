@@ -108,25 +108,16 @@ const Dashboard = () => {
                 icon="🎯"
                 label="Total sesiones"
                 value={stats.totalSessions}
-                color="primary"
               />
               <StatsCard
                 icon="⏱️"
                 label="Minutos totales"
                 value={stats.totalMinutes}
-                color="success"
               />
               <StatsCard
-                icon="🍅"
+                icon="⏲️"
                 label="Pomodoros"
                 value={stats.completedPomodoros}
-                color="warning"
-              />
-              <StatsCard
-                icon="⭐"
-                label="Puntos ganados"
-                value={stats.pointsEarned}
-                color="info"
               />
             </>
           ) : null}
