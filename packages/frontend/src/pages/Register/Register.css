@@ -1,47 +1,82 @@
-/* 
- * Estilos para la página de Registro
- *
- * Teacher note:
- * - Reutiliza estilos similares a Login
- * - En producción, considerar crear un CSS compertido para auth pages
-*/
+/* ========================================
+   CONTENEDOR PRINCIPAL
+   ======================================== */
 
 .register-page {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100dvh;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  padding: 1rem;
+  background: linear-gradient(
+    135deg,
+    var(--color-secondary) 0%,
+    var(--color-primary) 100%
+  );
+  padding: var(--spacing-md);
 }
 
+/* ========================================
+   CARD DE REGISTRO
+   ======================================== */
+
 .register-container {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-xl);
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
 }
+
+/* ========================================
+   ENCABEZADO
+   ======================================== */
 
 .register-title {
   font-size: 2rem;
-  color: #333;
-  margin-bottom: 0.5rem;
+  font-weight: 800;
+  color: var(--color-gray-50);
+  margin-bottom: var(--spacing-xs);
   text-align: center;
+  letter-spacing: -0.02em;
 }
 
 .register-subtitle {
   font-size: 0.95rem;
-  color: #666;
+  font-weight: 400;
+  color: var(--color-gray-300);
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-xl);
+  line-height: 1.5;
 }
 
-/* Responsive */
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
 @media (max-width: 480px) {
+  .register-page {
+    padding: var(--spacing-sm);
+  }
+
   .register-container {
-    padding: 1.5rem;
+    padding: var(--spacing-lg);
+    max-width: 100%;
+  }
+
+  .register-title {
+    font-size: 1.75rem;
+  }
+
+  .register-subtitle {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .register-container {
+    padding: var(--spacing-md);
   }
 
   .register-title {

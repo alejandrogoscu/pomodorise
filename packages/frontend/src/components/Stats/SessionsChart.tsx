@@ -120,12 +120,13 @@ function SessionsChart({ data }: SessionsChartProps) {
             stroke="rgba(255,255,255,0.7)"
             style={{ fontSize: "0.875rem" }}
             allowDecimals={false}
+            domain={[0, (dataMax: number) => dataMax + 1]}
           />
 
           {/* Tooltip al pasar el mouse */}
           <Tooltip
             contentStyle={{
-              backgroundColor: "rgba(255,255,255,0.95)",
+              backgroundColor: "rgba(0,0,0,0.3)",
               border: "none",
               borderRadius: "var(--border-radius-md)",
               boxShadow: "var(--shadow-md)",

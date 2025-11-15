@@ -1,18 +1,15 @@
-/* 
- * Estilos compartidos para formularios
- * 
- * Teacher note:
- * - CSS reutilizable para Login y Register
- * - Mobile-first con responsive design
- * - Estados: normal, focus, error, disabled
-*/
+/* ========================================
+   CONTENEDOR Y FORMULARIO BASE
+   ======================================== */
 
-/* Contenedor del formulario */
 .form {
   width: 100%;
 }
 
-/* Grupo de input (label + input + error message) */
+/* ========================================
+   GRUPOS DE FORMULARIO
+   ======================================== */
+
 .form-group {
   margin-bottom: 1.5rem;
 
@@ -21,146 +18,198 @@
   }
 }
 
-/* Labels */
+/* ========================================
+   LABELS
+   ======================================== */
+
 .form-label {
   display: block;
   font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-gray-700);
-  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: var(--color-gray-500);
+  margin-bottom: var(--spacing-sm);
+  letter-spacing: 0.02em;
 }
 
-/* Inputs */
+/* ========================================
+   INPUTS
+   ======================================== */
+
 .form-input {
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid var(--color-gray-300);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--color-gray-300);
   border-radius: var(--border-radius-md);
   font-size: 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  background-color: white;
+  font-weight: 500;
+  color: var(--color-gray-100);
+  transition: all 0.2s ease;
+}
 
-  &:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  }
+.form-input:hover:not(:disabled) {
+  border-color: var(--color-accent);
+}
 
-  &::placeholder {
-    color: var(--color-gray-400);
-  }
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-input::placeholder {
+  color: var(--color-gray-400);
+  font-weight: 400;
+}
+
+.form-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.7);
 }
 
 /* Input con error */
 .form-input.error {
   border-color: var(--color-danger);
-
-  &:focus {
-    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
-  }
+  background: rgba(220, 53, 69, 0.05);
 }
 
-/* Mensaje de error */
+.form-input.error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+/* ========================================
+   MENSAJES DE ERROR
+   ======================================== */
+
 .form-error {
   display: block;
-  margin-top: 0.5rem;
+  margin-top: var(--spacing-xs);
   font-size: 0.8rem;
+  font-weight: 600;
   color: var(--color-danger);
 }
 
-/* Alerta general (éxito o error) */
+/* ========================================
+   ALERTAS
+   ======================================== */
+
 .form-alert {
-  padding: 0.75rem 1rem;
+  padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--border-radius-md);
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--spacing-md);
   font-size: 0.9rem;
+  font-weight: 500;
   line-height: 1.4;
 }
 
 .form-alert.error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background: rgba(220, 53, 69, 0.1);
+  color: var(--color-danger);
+  border: 1px solid rgba(220, 53, 69, 0.3);
 }
 
 .form-alert.success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--color-success);
+  border: 1px solid rgba(40, 167, 69, 0.3);
 }
 
-/* Botón de submit */
+/* ========================================
+   BOTONES
+   ======================================== */
+
 .form-button {
   width: 100%;
-  padding: 0.875rem;
+  padding: var(--spacing-sm) var(--spacing-lg);
   border: none;
   border-radius: var(--border-radius-md);
-  background-color: var(--color-primary);
+  background-color: var(--color-accent);
   color: white;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-
-  &:hover:not(:disabled) {
-    background-color: var(--color-primary-dark);
-    transform: translateY(-1px);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  &:disabled {
-    background-color: var(--color-gray-400);
-    cursor: not-allowed;
-    opacity: 0.7;
-  }
+  gap: var(--spacing-xs);
 }
 
-/* Spinner dentro del botón */
+.form-button:hover:not(:disabled) {
+  background-color: var(--color-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.form-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.form-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   SPINNER
+   ======================================== */
+
 .button-spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid white;
+  border: 2px solid currentColor;
   border-top-color: transparent;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
 
-/* Link de navegación */
-.form-footer {
-  margin-top: 1.5rem;
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--color-gray-600);
-}
-
-.form-footer a {
-  color: var(--color-primary);
-  font-weight: 600;
-  text-decoration: none;
-  transition: color 0.2s;
-
-  &:hover {
-    color: var(--color-primary-dark);
-    text-decoration: underline;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
-/* Responsive */
+/* ========================================
+   FOOTER DE FORMULARIO
+   ======================================== */
+
+.form-footer {
+  margin-top: var(--spacing-lg);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--color-gray-200);
+}
+
+.form-footer a {
+  color: var(--color-accent);
+  font-weight: 700;
+  margin-left: var(--spacing-xs);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.form-footer a:hover {
+  color: var(--color-hover);
+  text-decoration: underline;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
 @media (max-width: 480px) {
   .form-input {
-    padding: 0.625rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
     font-size: 0.95rem;
   }
 
   .form-button {
-    padding: 0.75rem;
+    padding: var(--spacing-xs) var(--spacing-md);
     font-size: 0.95rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
   }
 }
