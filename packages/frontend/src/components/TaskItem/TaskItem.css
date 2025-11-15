@@ -181,7 +181,7 @@
 }
 
 .task-action-delete:hover {
-  background-color: red;
+  background-color: rgba(255, 86, 86, 0.7);
 }
 
 /* ========================================

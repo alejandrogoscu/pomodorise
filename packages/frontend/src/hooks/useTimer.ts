@@ -30,7 +30,7 @@ export type TimerStatus = "idle" | "running" | "paused" | "completed";
  * - long_break: 15 minutos de descanso cada 4 pomodoros
  */
 const DURATIONS: Record<TimerType, number> = {
-  work: 1 * 60,
+  work: 25 * 60,
   break: 5 * 60,
   long_break: 15 * 60,
 };

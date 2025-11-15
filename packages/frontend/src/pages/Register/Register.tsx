@@ -124,8 +124,8 @@ const Register = () => {
         <form className="form" onSubmit={handleSubmit}>
           {/* Campo Name (opcional) */}
           <div className="form-group">
-            <label htmlFor="name" className="form-lab">
-              Nombre (opcional)
+            <label htmlFor="name" className="form-label">
+              Nombre
             </label>
             <input
               id="name"
