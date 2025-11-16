@@ -47,6 +47,8 @@ COPY --from=builder /app/packages/shared ./packages/shared
 
 RUN CI=true pnpm install --prod --filter @pomodorise/backend...
 
+RUN echo "Contenido de /app/dist en imagen final:" && ls -l /app/dist
+
 ENV NODE_ENV=production
 ENV PORT=4000
 

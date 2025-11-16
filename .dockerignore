@@ -16,3 +16,10 @@ coverage
 .DS_Store
 npm-debug.log
 pnpm-debug.log
+
+
+README.md
+*.md
+.editorconfig
+.github/
+packages/frontend/
