@@ -1,208 +1,175 @@
 # 🕒 PomodoRise – Productivity Level Up
 
-**PomodoRise** es una aplicación **Full Stack** desarrollada íntegramente en **TypeScript**, diseñada para ayudarle a mejorar su productividad mediante la técnica **Pomodoro**, la **gestión de tareas** y la **gamificación del progreso personal**.
+**PomodoRise** is a **Full Stack** application fully developed in **TypeScript**, designed to help you boost your productivity using the **Pomodoro technique**, **task management**, and **personal progress gamification**.
 
-Este proyecto está orientado al aprendizaje práctico de TypeScript en frontend y backend, siguiendo **principios de Clean Code, arquitectura escalable y buenas prácticas profesionales**.
+This project is aimed at practical learning of TypeScript in both frontend and backend, following **Clean Code principles, scalable architecture, and professional best practices**.
 
 ---
 
-## 📚 Índice
+## 📚 Table of Contents
 
-1. [Descripción](#-descripción)
-2. [Tecnologías](#-tecnologías)
-3. [Estructura del monorepo](#-estructura-del-monorepo)
-4. [Características principales](#-características-principales)
-5. [Instalación y ejecución](#-instalación-y-ejecución)
+1. [Description](#-description)
+2. [Technologies](#-technologies)
+3. [Monorepo Structure](#-monorepo-structure)
+4. [Main Features](#-main-features)
+5. [Installation and Running](#-installation-and-running)
 6. [Testing](#-testing)
-7. [Documentación](#-documentación)
-8. [Guía de aprendizaje TypeScript](#-guía-de-aprendizaje-typescript)
-9. [Buenas prácticas](#-buenas-prácticas)
-10. [Licencia](#-licencia)
+7. [Documentation](#-documentation)
+8. [TypeScript Learning Guide](#-typescript-learning-guide)
+9. [Best Practices](#-best-practices)
+10. [License](#-license)
 
 ---
 
-## 🧠 Descripción
+## 🧠 Description
 
-**PomodoRise** le permite:
+**PomodoRise** allows you to:
 
-- Crear una cuenta de usuario.
-- Configurar su duración de trabajo y descansos.
-- Añadir tareas o rutinas a completar durante las sesiones.
-- Escuchar música (Spotify o pistas locales).
-- Completar sesiones Pomodoro y ganar puntos.
-- Subir de nivel según la constancia.
-- Visualizar su progreso con gráficos e indicadores de productividad.
+- Create a user account.
+- Set your work and break durations.
+- Add tasks or routines to complete during sessions.
+- Complete Pomodoro sessions and earn points.
+- Level up based on consistency.
+- Visualize your progress with charts and productivity indicators.
 
-Todo ello en un **entorno profesional, educativo y moderno**, creado para comprender y dominar TypeScript en un proyecto real.
+All in a **professional, educational, and modern environment**, designed to understand and master TypeScript in a real project.
 
 ---
 
-## ⚙️ Tecnologías
+## ⚙️ Technologies
 
 ### 🔹 Backend
 
 - Node.js + Express
-- TypeScript moderno
+- Modern TypeScript
 - MongoDB + Mongoose
 - JWT + bcrypt
-- Zod para validaciones
-- Jest para tests
-- Swagger UI para documentación API
+- Jest for testing
+- Swagger UI for API documentation
 
 ### 🔹 Frontend
 
 - React + TypeScript + Vite
-- CSS moderno (Grid + Flexbox, sin Tailwind)
+- Modern CSS
 - React Router DOM
 - React Hook Form
 - Axios
-- Recharts para estadísticas
-- Jest + React Testing Library
+- Recharts for statistics
+- Vitest + React Testing Library
 
 ### 🔹 Shared
 
-- Tipos e interfaces comunes (`User`, `Task`, `Session`, etc.)
-- Enums, DTOs y helpers reutilizables
+- Common types and interfaces (`User`, `Task`, `Session`, etc.)
+- Reusable enums, DTOs, and helpers
 
 ---
 
-## 🧱 Estructura del monorepo
+## 🧱 Monorepo Structure
 
 ```
 pomodorise/
 ├── packages/
-│   ├── backend/      → API REST con Express + TypeScript + MongoDB
+│   ├── backend/      → REST API with Express + TypeScript + MongoDB
 │   ├── frontend/     → React + TypeScript + CSS
-│   ├── shared/       → Tipos y utilidades compartidas
+│   ├── shared/       → Shared types and utilities
 ├── pnpm-workspace.yaml
-├── package.json      → Configuración raíz de workspaces
-├── tsconfig.base.json     → Config base de TypeScript
-└── README.md         → Este archivo
+├── package.json      → Root workspace configuration
+├── tsconfig.base.json     → Base TypeScript config
+└── README.md         → This file
 ```
 
-### 📦 Gestor de paquetes recomendado:
+### 📦 Recommended package manager:
 
-**pnpm** (por rendimiento y gestión eficiente de workspaces)
-
----
-
-## 🚀 Características principales
-
-| Categoría                   | Descripción                                       |
-| --------------------------- | ------------------------------------------------- |
-| 🎯 **Pomodoro Timer**       | Inicia, pausa y reinicia sesiones configurables   |
-| 🧾 **Gestión de tareas**    | Añade, marca y elimina tareas por sesión          |
-| 🕹️ **Gamificación**         | Gana puntos y sube de nivel según tu constancia   |
-| 🎧 **Música integrada**     | Selecciona playlist de Spotify o usa música local |
-| 📊 **Dashboard**            | Visualiza tu progreso y estadísticas              |
-| 👤 **Autenticación segura** | Registro y login con JWT                          |
-| ⚡ **API documentada**      | Swagger UI disponible en `/api-docs`              |
-| 🧪 **Testing completo**     | Pruebas unitarias e integradas con Jest           |
-| 🧩 **Código educativo**     | Comentarios explicativos y tipado estricto        |
+**pnpm** (for performance and efficient workspace management)
 
 ---
 
-## 🛠️ Instalación y ejecución
+## 🚀 Main Features
 
-### 1️⃣ Clonar el repositorio
+| Category                     | Description                                   |
+| ---------------------------- | --------------------------------------------- |
+| 🎯 **Pomodoro Timer**        | Start, pause, and reset configurable sessions |
+| 🧾 **Task Management**       | Add, mark, and remove tasks per session       |
+| 🕹️ **Gamification**          | Earn points and level up based on consistency |
+| 📊 **Dashboard**             | Visualize your progress and statistics        |
+| 👤 **Secure Authentication** | Registration and login with JWT               |
+
+---
+
+## 🛠️ Installation and Running
+
+### 1️⃣ Clone the repository
 
 ```bash
-git clone https://github.com/<usuario>/pomodorise.git
+git clone https://github.com/alejandrogoscu/pomodorise.git
 cd pomodorise
 ```
 
-### 2️⃣ Instalar dependencias
+### 2️⃣ Install dependencies
 
 ```bash
 pnpm install
 ```
 
-### 3️⃣ Variables de entorno
+### 3️⃣ Environment variables
 
-Crear un archivo `.env` en `/packages/backend` con las siguientes claves:
+Create a `.env` file in `/packages/backend` with the following keys:
 
 ```
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/pomodorise
 JWT_SECRET=supersecret
-SPOTIFY_CLIENT_ID=tu_id
-SPOTIFY_CLIENT_SECRET=tu_secreto
+SPOTIFY_CLIENT_ID=your_id
+SPOTIFY_CLIENT_SECRET=your_secret
 ```
 
-### 4️⃣ Ejecutar en modo desarrollo
+### 4️⃣ Run in development mode
 
 ```bash
 pnpm dev
 ```
 
-Esto lanzará tanto el backend como el frontend simultáneamente.
+This will launch both backend and frontend simultaneously.
 
 ---
 
-## 🧪 Testing
+## 🧹 Best Practices Applied
 
-Ejecutar los tests unitarios y de integración:
-
-```bash
-pnpm test
-```
-
-Cada paquete (`backend`, `frontend`) contiene su propia configuración de Jest.
-El objetivo es alcanzar **≥ 80% de cobertura** en controladores, servicios y componentes.
-
----
-
-## 📘 Documentación
-
-- **API REST:** Documentada con **Swagger UI** en `/api-docs`.
-- **Código:** Comentarios JSDoc para cada módulo, clase y función.
-- **Estructura educativa:** Cada bloque de código importante explica su propósito y relación con los principios de TypeScript.
-
----
-
-## 📖 Guía de aprendizaje TypeScript
-
-El proyecto sirve como guía para:
-
-- Comprender el tipado estricto en TypeScript.
-- Diferenciar interfaces, types y clases.
-- Aplicar genéricos, enums y DTOs.
-- Separar responsabilidades y definir arquitecturas limpias.
-- Escribir código mantenible y seguro.
-
-> Cada módulo está diseñado para enseñar un concepto clave de TypeScript aplicado en contexto real.
-
----
-
-## 🧹 Buenas prácticas aplicadas
-
-- ✅ **Clean Architecture** (Controllers / Services / Repositories).
-- ✅ **Principios SOLID**.
-- ✅ **Nombres semánticos y consistentes**.
-- ✅ **Sin duplicaciones** (DRY).
-- ✅ **Funciones pequeñas y puras**.
-- ✅ **Error handling centralizado**.
-- ✅ **Documentación JSDoc + Swagger**.
-- ✅ **Tests desde el inicio (TDD opcional)**.
-- ✅ **Linter + Formateo automático (ESLint + Prettier)**.
+- ✅ **Clean Architecture** (Controllers / Services / Repositories)
+- ✅ **SOLID Principles**
+- ✅ **Semantic and consistent naming**
+- ✅ **No duplication (DRY)**
+- ✅ **Small, pure functions**
+- ✅ **Centralized error handling**
 
 ---
 
 ## 🗺️ Roadmap
 
-| Fase                        | Descripción                            |
-| --------------------------- | -------------------------------------- |
-| **1️⃣ Setup monorepo**       | Estructura base, dependencias, configs |
-| **2️⃣ Backend MVP**          | Modelos, controladores, autenticación  |
-| **3️⃣ Frontend MVP**         | Páginas principales y componentes      |
-| **4️⃣ Integración API**      | Flujo completo usuario–tareas–sesiones |
-| **5️⃣ Gamificación**         | Puntos, niveles y progreso             |
-| **6️⃣ Dashboard**            | Estadísticas con gráficos              |
-| **7️⃣ Tests y refinamiento** | Cobertura y documentación final        |
+| Phase                  | Description                           |
+| ---------------------- | ------------------------------------- |
+| **1️⃣ Setup monorepo**  | Base structure, dependencies, configs |
+| **2️⃣ Backend MVP**     | Models, controllers, authentication   |
+| **3️⃣ Frontend MVP**    | Main pages and components             |
+| **4️⃣ API Integration** | Full user–task–session flow           |
+| **5️⃣ Gamification**    | Points, levels, and progress          |
+| **6️⃣ Dashboard**       | Statistics with charts                |
 
 ---
 
-## 📜 Licencia
+## 📝 Future Features
 
-MIT © 2025 — Desarrollado por **Alejandro Goscu**
-Creado como proyecto formativo de **Full Stack TypeScript**, con el objetivo de **aprender, enseñar y demostrar buenas prácticas profesionales**.
+Potential features for future updates:
+
+- 🎵 Listen to music (Spotify or local tracks)
+- 📅 Calendar integration for scheduling sessions
+- 🌐 Multi-language support
+- 🏆 Rewards and gamification enhancements
+- 👤 Profile customization and personalization
+
+---
+
+## 📜 License
+
+MIT © 2025 — Developed by **Alejandro Goscu**  
+Created as a **Full Stack TypeScript learning project**, aimed at **learning, teaching, and demonstrating professional best practices**.
