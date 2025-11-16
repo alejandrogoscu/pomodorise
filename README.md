@@ -8,16 +8,15 @@ This project is aimed at practical learning of TypeScript in both frontend and b
 
 ## 📚 Table of Contents
 
-1. [Description](#-description)
-2. [Technologies](#-technologies)
-3. [Monorepo Structure](#-monorepo-structure)
-4. [Main Features](#-main-features)
-5. [Installation and Running](#-installation-and-running)
-6. [Testing](#-testing)
-7. [Documentation](#-documentation)
-8. [TypeScript Learning Guide](#-typescript-learning-guide)
-9. [Best Practices](#-best-practices)
-10. [License](#-license)
+1. [Description](#🧠-description)
+2. [Technologies](#⚙️-technologies)
+3. [Monorepo Structure](#🧱-monorepo-structure)
+4. [Main Features](#🚀-main-features)
+5. [Installation and Running](#🛠️-installation-and-running)
+6. [Best Practices](#🧹-best-practices-applied)
+7. [Roadmap](#🗺️-roadmap)
+8. [Future Features](#📝-future-features)
+9. [License](#📜-license)
 
 ---
 
