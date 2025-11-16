@@ -1,14 +1,3 @@
-/*
- * Página de Login
- *
- * Teacher note:
- * - Usa useState para manejar inputs y errores
- * - Integra con AuthContext para login
- * - Validación básica antes de enviar (email format, passwors length)
- * - Muestra loading en botón durante petición
- * - Redirige a /dashboard después de login exitoso
- */
-
 import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -19,32 +8,20 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // Estado del formulario
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Estado de UI
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Errores de validación por campo
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string;
     password?: string;
   }>({});
 
-  /*
-   * Validar campos del formulario
-   *
-   * Teacher note:
-   * - Validación básica en el cliente (UX)
-   * - El backend también valida (seguridad)
-   * - Regex simple para email (no 100% preciso, pero suficiente)
-   */
   const validateForm = (): boolean => {
     const errors: typeof fieldErrors = {};
 
-    // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       errors.email = "El email es obligatorio";
@@ -52,7 +29,6 @@ const Login = () => {
       errors.email = "Email inválido";
     }
 
-    // Validar password
     if (!password) {
       errors.password = "La contraseña es obligatoria";
     } else if (password.length < 6) {
@@ -63,22 +39,12 @@ const Login = () => {
     return Object.keys(errors).length === 0;
   };
 
-  /*
-   * Manejar submit del formulario
-   * Teacher note:
-   * - preventDefault() evita recarga de página
-   * - Validamos antes de hacer la petición
-   * - Usamos try/catch para errores de red o del backend
-   * - Mostramos mensajes de error amigables al usuario
-   */
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    // Limpiar errores previos
     setError("");
     setFieldErrors({});
 
-    // Validar formulario
     if (!validateForm) {
       return;
     }
@@ -86,16 +52,12 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Llamar al contexto de auth (que llama al servicio)
       await login(email, password);
 
-      // Si llega aquí, login exitoso -> redirigir a dashboard
       navigate("/dashboard");
     } catch (err: any) {
-      // Maneja errores del backend
       console.error("Error en login:", err);
 
-      // Mostrar mensaje de error amigable
       if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else if (err.response?.status === 401) {

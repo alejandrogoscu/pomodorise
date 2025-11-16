@@ -1,12 +1,10 @@
 {
   "compilerOptions": {
-    // Opciones de lenguaje moderno
     "target": "ES2022",
     "lib": ["ES2022"],
     "module": "commonjs",
     "moduleResolution": "node",
 
-    // Generación de código
     "outDir": "./dist",
     "rootDir": "./src",
     "removeComments": true,
@@ -14,27 +12,23 @@
     "declarationMap": true,
     "sourceMap": true,
 
-    // Interoperabilidad
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
 
-    // Strictness (lo más importante para TypeScript)
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
 
-    // Paths para importar entre paquetes
     "baseUrl": ".",
     "paths": {
       "@pomodorise/shared": ["./packages/shared/src"],
       "@pomodorise/shared/*": ["./packages/shared/src/*"]
     },
 
-    // Decorators (para futuros features)
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },

@@ -1,5 +1,3 @@
-// ...existing code...
-
 import { useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useStats } from "../../hooks/useStats";
@@ -16,13 +14,6 @@ const Dashboard = () => {
   const { stats, isLoading: statsLoading, error: statsError } = useStats(); //
   const navigate = useNavigate();
 
-  /*
-   * Ref para acceder a TaskList y llamar a loadTasks
-   *
-   * Teacher note:
-   * - Usar tipo TaskListHandle exportado desde TaskList
-   * - React.RefObject<TaskListHandle> es el tipo correcto
-   */
   const taskListRef = useRef<TaskListHandle>(null);
   const timerRef = useRef<TimerHandle>(null);
 
@@ -31,24 +22,10 @@ const Dashboard = () => {
     navigate("/login");
   };
 
-  /*
-   * Callback cuando Timer completa un pomodoro work
-   *
-   * Teacher note:
-   * - Timer notifica → Dashboard refresca TaskList
-   * - Mantiene lista sincronizada con completedPomodoros actualizados
-   */
   const handlePomodoroCompleted = () => {
     taskListRef.current?.loadTasks();
   };
 
-  /*
-   * Callback cuando TaskList crea/actualiza una tarea
-   *
-   * Teacher note:
-   * - TaskList notifica -> Dashboard refresca selector de Timer
-   * - Permite seleccionar tarea recién creada sin recargar página
-   */
   const handleTaskListChange = () => {
     timerRef.current?.reloadTasks();
   };

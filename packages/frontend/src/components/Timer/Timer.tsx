@@ -1,19 +1,3 @@
-/*
- * Componente Timer - Interfaz visual del Pomodoro
- *
- * Teacher note:
- * - Componente presentacional (no maneja lógica de negocio) solo renderiza
- * - Usa el hook useTimer para obtener estado y acciones
- * - Usa callbacks para notificar eventos al componente padre
- * - SVG para el círculo de progreso animado
- * - CSS separado para mantener componente limpio
- * - Selector de tarea para vincular sesiones con tareas
- * - Expone reloadTasks via forwardRef para actualizar selector desde Dashboard
- *
- * Analogía: El Timer es como un reloj en la pared (solo muestra)
- * mientras que useTimer es el mecanismo interno (hace funcionar)
- */
-
 import {
   useCallback,
   useState,
@@ -29,60 +13,23 @@ import { ITask, TaskStatus } from "@pomodorise/shared";
 import { useToast } from "../../context/ToastContext";
 import "./Timer.css";
 
-/*
- * Props del componente Timer
- *
- * Teacher note:
- * - onPomodoroCompleted: callback cuando se completa un pomodoro work
- * - Permite al Dashboard refrescar TaskList sin acoplar componentes
- */
 interface TimerProps {
   onPomodoroCompleted?: () => void;
 }
 
-/*
- * Métodos expuestos al Dashboard (para recarga externa)
- *
- * Teacher note:
- * - reloadTasks permite al Dashboard actualizar el selector cuando se crea una tarea
- */
 export interface TimerHandle {
   reloadTasks: () => Promise<void>;
 }
 
-/*
- * Componente Timer con ref forwarding
- *
- * Teacher note:
- * - forwardRef permite exponer métodos al Dashboard
- * - useImperativeHandle define qué métodos son públicos
- * - Expone reloadTasks para actualizar selector cuando se crea/elimina tarea
- */
 const Timer = forwardRef<TimerHandle, TimerProps>(
   ({ onPomodoroCompleted }, ref) => {
     const { updateUser } = useAuth();
     const { showToast } = useToast();
 
-    /*
-     * Estado para selector de tareas
-     *
-     * Teacher note:
-     * - activeTasks: solo tareas pendientes o en progreso
-     * - selectedTaskId: tarea actualmente seleccionada
-     * - isLoadingTask: feedback visual durante carga
-     */
     const [activeTasks, setActiveTasks] = useState<ITask[]>([]);
     const [selectedTaskId, setSelectedTaskId] = useState<string>("");
     const [isLoadingTasks, setIsLoadingTasks] = useState(false);
 
-    /*
-     * Carga tareas activas
-     *
-     * Teacher note:
-     * - Extraida a funcion para poder reutilizar después de completar pomodoro
-     * - Las tareas completadas no aparecen en el selector
-     * - Mantiene la tarea seleccionada si sigue activa
-     */
     const loadActiveTasks = useCallback(async () => {
       setIsLoadingTasks(true);
 
@@ -95,7 +42,6 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
         );
         setActiveTasks(active);
 
-        // Si la tarea seleccionada ya no está activa (se completó), limpiar selección
         if (selectedTaskId && !active.find((t) => t._id === selectedTaskId)) {
           setSelectedTaskId("");
         }
@@ -108,57 +54,34 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
       }
     }, [selectedTaskId, showToast]);
 
-    /*
-     * Exponer loadActiveTasks al Dashboard
-     *
-     * Teacher note:
-     * - Dashboard puede llamar: timerRef.current.reloadTasks()
-     * - Útil cuando se crea/elimina una tarea en TaskList
-     */
     useImperativeHandle(ref, () => ({
       reloadTasks: loadActiveTasks,
     }));
 
-    /*
-     * Cargar tareas al montar componente
-     */
     useEffect(() => {
       loadActiveTasks();
     }, [loadActiveTasks]);
 
-    /*
-     * Callbacks para manejar eventos de sesiones
-     *
-     * Teacher note:
-     * - Después de completar "work" -> recarga tareas
-     * - onComplete: ejecutado cuando se completa una sesión de trabajo
-     * - onSessionCreated: ejecutado cuando se crea una sesión en backend
-     * - onError: maneja errores de red
-     */
     const handleComplete = useCallback(
       (result: {
         type: "work" | "break" | "long_break";
         pointsEarned: number;
         user: { level: number; points: number; streak: number };
       }) => {
-        // Actualizar contexto de usuario con nuevos valores
         updateUser({
           level: result.user.level,
           points: result.user.points,
           streak: result.user.streak,
         });
 
-        // Mostrar notificación según tipo de sesión
         if (result.type === "work") {
           showToast(
             `¡Sesión completada! +${result.pointsEarned} puntos. Nivel ${result.user.level} • Racha ${result.user.streak}. ¡Sigue así!`,
             "success"
           );
 
-          // recargar tareas para actualizar selector
           loadActiveTasks();
 
-          // Notificar al Dashboard para refrescar TaskList
           onPomodoroCompleted?.();
         } else if (result.type === "break") {
           showToast(
@@ -166,7 +89,6 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
             "info"
           );
         } else {
-          // Long_break
           showToast(
             `¡Descanso largo completado! +${result.pointsEarned} puntos. ¡Excelente trabajo!`,
             "info"
@@ -188,13 +110,6 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
       [showToast]
     );
 
-    /*
-     * Inicializar hook con callbacks y taskId seleccionado
-     *
-     * Teacher note:
-     * - Pasamos selectedTaskId o undefined si no hay selección
-     * - useTimer se encargará de enviarlo al backend al crear sesión
-     */
     const {
       timeLeft,
       totalTime,
@@ -213,26 +128,11 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
       onError: handleError,
     });
 
-    /*
-     * Calcular progreso para el círculo SVG
-     *
-     * Teacher note:
-     * - circumference: perímetro del círculo (2πr)
-     * - dashoffset: controla cuánto del trazo se dibuja
-     * - Invertimos el cálculo para que progrese visualmente
-     */
     const radius = 120; // radio del círculo en píxeles
     const circumference = 2 * Math.PI * radius;
     const progress = calculateProgress(timeLeft, totalTime);
     const dashoffset = circumference - (progress / 100) * circumference;
 
-    /*
-     * Obtener texto según tipo de sesión
-     *
-     * Teacher note:
-     * - Mensaje descriptivo para el usuario
-     * - Más claro que solo mostrar "work", "break"
-     */
     const getTypeLabel = (): string => {
       switch (type) {
         case "work":
@@ -246,13 +146,6 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
       }
     };
 
-    /*
-     * Obtener color del círculo según tipo
-     *
-     * Teacher note:
-     * - Variables CSS definidas en :root
-     * - Feedback visual: trabajo (primario), descanso (éxito)
-     */
     const getCircleColor = (): string => {
       switch (type) {
         case "work":
@@ -265,13 +158,6 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
       }
     };
 
-    /*
-     * Determinar si aplicar efecto pulse al círculo
-     *
-     * Teacher note:
-     * - Solo cuando está corriendo y no está guardando sesión
-     * - Feedback visual sutil de que el timer está activo
-     */
     const shouldPulse = status === "running" && !isCreatingSession;
 
     return (

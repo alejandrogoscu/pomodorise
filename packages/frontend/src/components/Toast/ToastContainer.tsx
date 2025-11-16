@@ -1,12 +1,3 @@
-/*
- * ToastContainer - Renderiza el stack de toasts en la esquina superior derecha
- *
- * Teacher note:
- * - Recibe la lista de toasts y la función para cerrarlos
- * - Usa el componente Toast individual para cada notificación
- * - Se posiciona con .toast-container
- */
-
 import Toast from "./Toast";
 import "./Toast.css";
 

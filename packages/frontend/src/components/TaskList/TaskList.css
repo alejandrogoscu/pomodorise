@@ -117,9 +117,6 @@
   flex: 1;
 }
 
-/* 
- * Spinner animado
-*/
 .spinner {
   width: 40px;
   height: 40px;
@@ -163,10 +160,6 @@
   background: var(--color-hover);
   transform: translateY(-2px);
 }
-
-/* 
- * Empty state
-*/
 
 .task-list-empty {
   margin: 0 auto;

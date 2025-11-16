@@ -1,22 +1,8 @@
-/*
- * Controlador de Sesiones (HTTP Layer)
- *
- * Teacher note:
- * - Los controladores solo manejan HTTP (request/response)
- * - La lógica de negocio está en sessionService
- * - Esto facilita testing y reutilización de código
- */
-
 import { Response } from "express";
 import { AuthRequest } from "./authController";
 import { CreateSessionDTO, UserStats } from "@pomodorise/shared";
 import * as sessionService from "../services/sessionService";
 
-/*
- * GET /api/sessions
- *
- * Obtiene el historial de sesiones del usuario autenticado
- */
 export const getSessions = async (
   req: AuthRequest,
   res: Response
@@ -27,7 +13,6 @@ export const getSessions = async (
       return;
     }
 
-    // Construir filtros
     const filters: { completed?: boolean } = {};
     if (req.query.completed !== undefined) {
       filters.completed = req.query.completed === "true";
@@ -35,7 +20,6 @@ export const getSessions = async (
 
     const limit = parseInt(req.query.limit as string) || 50;
 
-    // Usar SERVICE LAYER
     const sessions = await sessionService.getUserSessions(
       req.user._id.toString(),
       filters,
@@ -53,11 +37,6 @@ export const getSessions = async (
   }
 };
 
-/*
- * POST /api/sessions
- *
- * Crea una nueva sesión de Pomodoro
- */
 export const createSession = async (
   req: AuthRequest,
   res: Response
@@ -70,7 +49,6 @@ export const createSession = async (
 
     const sessionData: CreateSessionDTO = req.body;
 
-    // Validación básica
     if (!sessionData.duration || !sessionData.type) {
       res.status(400).json({
         error: "Campos obligatorios: duration, type",
@@ -78,7 +56,6 @@ export const createSession = async (
       return;
     }
 
-    // Usar SERVICE LAYER
     const session = await sessionService.createSession(
       req.user._id.toString(),
       sessionData
@@ -92,7 +69,6 @@ export const createSession = async (
   } catch (error: any) {
     console.error("❌ Error en createSession:", error);
 
-    // Manejar errores específicos del service
     if (error.message.includes("Tarea no encontrada")) {
       res.status(404).json({ error: error.message });
       return;
@@ -106,11 +82,6 @@ export const createSession = async (
   }
 };
 
-/*
- * PATCH /api/sessions/:id/complete
- *
- * Marcar una sesión como completada y calcula puntos
- */
 export const completeSession = async (
   req: AuthRequest,
   res: Response
@@ -121,7 +92,6 @@ export const completeSession = async (
       return;
     }
 
-    // Usar SERVICE LAYER
     const result = await sessionService.completeSession(
       req.params.id,
       req.user._id.toString()
@@ -139,7 +109,6 @@ export const completeSession = async (
   } catch (error: any) {
     console.error("❌ Error en completeSession:", error);
 
-    // Manejar errores específicos del service
     if (
       error.message.includes("no encontrada") ||
       error.message.includes("sin permisos")
@@ -161,18 +130,6 @@ export const completeSession = async (
   }
 };
 
-/*
- * GET /api/sessions/stats
- * GET /api/stats (alias)
- *
- *
- * Obtiene estadísticas de sesiones del usuario autenticado
- *
- * Teacher note:
- * - Usa UserStats de shared para garantizar tipo consistente
- * - Calcula totalSessions. totalMinutes, completedPomodoros, etc.
- * - sessionsPerDay agrupa por fecha (útil para gráficos)
- */
 export const getSessionStats = async (
   req: AuthRequest,
   res: Response
@@ -183,22 +140,11 @@ export const getSessionStats = async (
       return;
     }
 
-    // Obtener todas las sesiones completadas del usuario
     const sessions = await sessionService.getUserSessions(
       req.user._id.toString(),
       { completed: true }
     );
 
-    /*
-     * Calcular estadísticas según UserStats de shared
-     *
-     * Teacher note:
-     * - totalSessions: cantidad de sesiones completadas
-     * - totalMinutes: suma de duración de todas las sesiones
-     * - completedPomodoros: solo sesiones de tipo "work"
-     * - averageSessionDuration: promedio redondeado
-     * - pointsEarned: suma de puntos de todas las sesiones
-     */
     const totalSessions = sessions.length;
 
     const totalMinutes = sessions.reduce(
@@ -218,14 +164,6 @@ export const getSessionStats = async (
       0
     );
 
-    /*
-     * Agrupar sesiones por día para gráficos
-     *
-     * Teacher note:
-     * - Convierte Date a string YYYY-MM-DD
-     * - Agrupa sesiones del mismo día
-     * - Útil para Recharts en frontend
-     */
     const sessionsPerDayMap = new Map<string, number>();
 
     sessions.forEach((session) => {
@@ -234,18 +172,10 @@ export const getSessionStats = async (
       sessionsPerDayMap.set(dateStr, currentCount + 1);
     });
 
-    // Convertir Map a array de objetos y ordenar por fecha
     const sessionsPerDay = Array.from(sessionsPerDayMap.entries())
       .map(([date, count]) => ({ date, count }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
-    /*
-     * Construir respuesta con tipo UserStats
-     *
-     * Teacher note:
-     * - TypeScript verifica que coincida con UserStats de shared
-     * - Si falta un campo, error de compilación
-     */
     const stats: UserStats = {
       totalSessions,
       totalMinutes,

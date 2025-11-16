@@ -69,7 +69,6 @@
   opacity: 0.5;
 }
 
-/* Label vacío pero necesario para accesibilidad */
 .task-checkbox-label {
   position: absolute;
   width: 1px;
@@ -88,7 +87,7 @@
 
 .task-item-content {
   flex: 1;
-  min-width: 0; /* Permite text-overflow en hijos */
+  min-width: 0;
 }
 
 .task-item-title {

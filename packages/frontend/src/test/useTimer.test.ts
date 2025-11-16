@@ -1,16 +1,7 @@
-/*
- * Test para useTimer hook
- *
- * Teacher note:
- * - Usamos @testing-library/react-hooks para probar hooks
- * - vi.useFakeTimers() para simular el paso del tiempo
- */
-
 import { renderHook, act } from "@testing-library/react";
-import { useTimer } from "./useTimer";
+import { useTimer } from "../hooks/useTimer";
 import { vi } from "vitest";
 
-// Mock de timers para testing
 vi.useFakeTimers();
 
 describe("useTimer", () => {
@@ -45,7 +36,6 @@ describe("useTimer", () => {
 
     const initialTime = result.current.timeLeft;
 
-    // Avanzar 3 segundos
     act(() => {
       vi.advanceTimersByTime(3000);
     });
@@ -70,12 +60,10 @@ describe("useTimer", () => {
 
     const pausedTime = result.current.timeLeft;
 
-    // Avanzar tiemop mientras está pausado
     act(() => {
       vi.advanceTimersByTime(5000);
     });
 
-    // El tiempo no debe cambiar
     expect(result.current.timeLeft).toBe(pausedTime);
     expect(result.current.status).toBe("paused");
   });

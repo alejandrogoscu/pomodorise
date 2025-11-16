@@ -1,22 +1,11 @@
-/*
- * Tests de autenticación
- *
- * Teacher note:
- * - Usamos supertest para hacer peticiones HTTP a la app sin levantar servidor
- * - En tests de integración usaríamos mongodb-memory-server para BD en memoria
- * - Por ahora mockeamos el modelo User
- */
-
 import request from "supertest";
 import app from "../index";
 import User from "../models/User";
 
-// Mockear conexión a BD (no queremos conectar a BD real en tests)
 jest.mock("../config/db", () => ({
   connectDB: jest.fn(),
 }));
 
-// Mockear modelo User
 jest.mock("../models/User");
 
 describe("Auth Endpoints", () => {
@@ -36,10 +25,8 @@ describe("Auth Endpoints", () => {
         save: jest.fn(),
       };
 
-      // Mockear User.findOne para simular que el usuario no existe
       (User.findOne as jest.Mock).mockResolvedValue(null);
 
-      // Mockear User.create para devolver usuario mockeado
       (User.create as jest.Mock).mockResolvedValue(mockUser);
 
       const response = await request(app).post("/api/auth/register").send({
@@ -54,7 +41,6 @@ describe("Auth Endpoints", () => {
     });
 
     it("Debería fallas si el email ya existe", async () => {
-      // Mockear User.findOne para simular que el usuario ya existe
       (User.findOne as jest.Mock).mockResolvedValue({
         email: "test@test.com",
       });
@@ -81,7 +67,6 @@ describe("Auth Endpoints", () => {
         comparePassword: jest.fn().mockResolvedValue(true),
       };
 
-      // Mockear búsqueda de usuario
       (User.findOne as jest.Mock).mockReturnValue({
         select: jest.fn().mockResolvedValue(mockUser),
       });
@@ -96,7 +81,6 @@ describe("Auth Endpoints", () => {
     });
 
     it("Debería fallas con credenciales inválidas", async () => {
-      // Usuario no encontrado
       (User.findOne as jest.Mock).mockReturnValue({
         select: jest.fn().mockResolvedValue(null),
       });

@@ -160,15 +160,6 @@
   overflow: hidden;
 }
 
-/*
- * Barra de progreso animada
- *
- * Teacher note:
- * - width se controla desde el componente con style inline (única excepción permitida)
- * - transition para animación suave cuando cambia el porcentaje
- * - gradiente para efecto visual atractivo
- * - Usa var(--color-warning) para consistencia con tema global
- */
 .level-progress-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--color-warning) 0%, #f59e0b 100%);
@@ -190,13 +181,6 @@
    RESPONSIVE
    ======================================== */
 
-/*
- * En pantallas pequeñas, cambiar a layout vertical
- *
- * Teacher note:
- * - Mobile-first approach: diseño base para escritorio
- * - Media query para ajustar en móviles
- */
 @media (max-width: 640px) {
   .user-profile {
     flex-direction: column;

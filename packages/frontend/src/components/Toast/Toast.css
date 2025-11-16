@@ -34,13 +34,6 @@
   pointer-events: auto;
 }
 
-/* 
- * Animación de entrada
- *
- * Teacher note:
- * - Desliza desde arriba con fade-in
- * - Duración corta para no molestar al usuario
-*/
 @keyframes slideIn {
   from {
     transform: translateY(-100%);
@@ -65,13 +58,6 @@
   padding-right: 0.5rem;
 }
 
-/* 
- * Botón de cerrar
- *
- * Teacher note:
- * - Interacción opcional si el usuario quiere cerrar antes
- * - Hover state para feedback visual
-*/
 .toast-close {
   position: absolute;
   top: 0.75rem;

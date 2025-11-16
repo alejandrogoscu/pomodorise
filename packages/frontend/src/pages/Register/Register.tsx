@@ -1,12 +1,3 @@
-/*
- * Página de Registro
- *
- * Teacher note:
- * - Similar a Login, pero con campo adicional: name (opcional)
- * - Validación: email, password (mínimo 6 caracteres)
- * - Después de registro exitoso, redirige a dashboard
- */
-
 import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -17,17 +8,14 @@ const Register = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
 
-  // Estado del formulario
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Estado de UI;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Errores de validación por campo
   const [fieldErrors, setFieldErrors] = useState<{
     name?: string;
     email?: string;
@@ -35,17 +23,9 @@ const Register = () => {
     canfirmPassword?: string;
   }>({});
 
-  /*
-   * Validar campos del formulario
-   *
-   * Teacher note:
-   * - Similal a Login, pero con validación extra de confirmPassword
-   * - name es opcional (algunos usuarios solo quieren email)
-   */
   const validateForm = (): boolean => {
     const errors: typeof fieldErrors = {};
 
-    // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       errors.email = "El email es obligatorio";
@@ -53,14 +33,12 @@ const Register = () => {
       errors.email = "Email inválido";
     }
 
-    // Validar password
     if (!password) {
       errors.password = "La contraseña es obligatoria";
     } else if (password.length < 6) {
       errors.password = "La contraseña debe de tener al menos 6 caracteres";
     }
 
-    // Validar confirmPassword
     if (!confirmPassword) {
       errors.canfirmPassword = "Confirma tu contraseña";
     } else if (password !== confirmPassword) {
@@ -71,17 +49,12 @@ const Register = () => {
     return Object.keys(errors).length === 0;
   };
 
-  /*
-   * Manejar submit del formulario
-   */
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    // Limpiar errores previos
     setError("");
     setFieldErrors({});
 
-    // Validar formulario
     if (!validateForm()) {
       return;
     }
@@ -89,15 +62,12 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      // Llamar al contexto de auth
       await register(email, password, name || undefined);
 
-      // Si llega aquí, registro exitoso -> redirigir a dashboard
       navigate("/dashboard");
     } catch (err: any) {
       console.error("Error en registro:", err);
 
-      // Mostrar mensaje de error amigable
       if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else if (err.response?.status === 409) {

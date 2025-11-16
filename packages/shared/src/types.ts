@@ -1,43 +1,15 @@
-/**
- * Tipos y enums compartidos entre backend y frontend
- *
- * Teacher note:
- * - Estos tipos son la "fuente de verdad" del dominio de la aplicación
- * - Backend usa estos tipos para validación con Zod
- * - Frontend los usa para tipar respuestas de la API
- * - Evitan duplicación y errores de sincronización
- */
-
-/**
- * Enum para estados de las tareas
- *
- * Teacher note:
- * - Un enum es un conjunto fijo de valores posibles
- * - TypeScript lo convierte en string literals en runtime
- */
 export enum TaskStatus {
   PENDING = "pending",
   IN_PROGRESS = "in_progress",
   COMPLETED = "completed",
 }
 
-/**
- * Enum para prioridades de tareas
- */
 export enum TaskPriority {
   LOW = "low",
   MEDIUM = "medium",
   HIGH = "high",
 }
 
-/**
- * Interface base para Usuario (para frontend y respuestas API)
- *
- * Teacher note:
- * - Omite detalles de implementación de Mongoose (save, remove, etc)
- * - Frontend NO necesita estos métodos
- * - _id como string porque frontend trabaja con strings, no ObjectId
- */
 export interface IUser {
   _id: string; // En frontend será string, en backend ObjectId
   email: string;
@@ -49,14 +21,6 @@ export interface IUser {
   updatedAt: Date;
 }
 
-/*
- * Interface para el documento Mongoose de User
- *
- * Teacher note:
- * - Esta interface es SOLO para el backend
- * - Incluye el campo password (hasheado) y métodos de Mongoose
- * - Frontend NUNCA ve esta interface
- */
 export interface IUserDocument {
   _id: string;
   email: string;
@@ -68,18 +32,9 @@ export interface IUserDocument {
   createdAt: Date;
   updatedAt: Date;
 
-  // Método personalizado apra comparar contraseñas
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-/*
- * Interface para estadísticas del usuario
- *
- * Teacher note:
- * - Compartida entre backend (calcula) y frontend (muestra)
- * - Estructura compatible con Recharts para gráficos
- * - sessionsPerDay: agrupa sesiones por fecha para timeline
- */
 export interface UserStats {
   totalSessions: number;
   totalMinutes: number;
@@ -89,13 +44,6 @@ export interface UserStats {
   pointsEarned: number;
 }
 
-/**
- * Interface para Tareas
- *
- * Teacher note:
- * - userId como string para simplificar en frontend
- * - Backend lo convertirá a ObjectId cuando sea necesario
- */
 export interface ITask {
   _id: string;
   userId: string;
@@ -110,13 +58,6 @@ export interface ITask {
   updatedAt: Date;
 }
 
-/**
- * Interface para Sesiones de Pomodoro
- *
- * Teacher note:
- * - Registra cada sesión completada
- * - Se usa para calcular puntos, rachas y estadísticas
- */
 export interface ISession {
   _id: string;
   userId: string;
@@ -130,14 +71,6 @@ export interface ISession {
   createdAt: Date;
   updatedAt: Date;
 }
-
-/**
- * DTOs (Data Transfer Objects) para requests del frontend
- *
- * Teacher note:
- * - Estos tipos representan la estructura de datos en requests HTTP
- * - Separan el modelo de BD de lo que el usuario envía
- */
 
 export interface RegisterDTO {
   email: string;
@@ -174,14 +107,6 @@ export interface CreateSessionDTO {
   type: "work" | "break" | "long_break";
 }
 
-/**
- * Tipos para respuestas de la API
- *
- * Teacher note:
- * - Envuelven datos en un formato consistente
- * - Facilitan manejo de errores en frontend
- */
-
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -202,16 +127,6 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-/*
- * Filtros para listar tareas
- *
- * Teacher note:
- * - Permite filtrar tareas por estado (completadas, pendientes, todas)
- * - Se usará en TaskList para pestañas de filtrado
- *
- * @example
- * getTasks({completed: false, limit: 10})  // Primeras 10 pendientes
- */
 export interface TaskFilters {
   status?: TaskStatus;
   limit?: number;

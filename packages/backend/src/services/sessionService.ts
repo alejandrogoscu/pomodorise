@@ -1,16 +1,3 @@
-/*
- * Service Layer para Sesiones
- *
- * Teacher note:
- * - Separa lógica de negocio de HTTP (controladores)
- * - Facilita testing (no necesitas Express para probar lógica)
- * - Usa utils de shared para calcular puntos (DRY)
- * - Centraliza transacciones y updates relacionados
- *
- * Analogía: sessionService es como el gerente de un gimnasio
- * (registra entrenamientos, actualiza membresías, calcula recompensas)
- */
-
 import Session, { ISessionDocument } from "../models/Session";
 import User from "../models/User";
 import Task from "../models/Task";
@@ -22,22 +9,10 @@ import {
 } from "@pomodorise/shared";
 import { Types } from "mongoose";
 
-/*
- * Crea una nueva sesión
- *
- * @param userId - ID del usuario
- * @param sessionData - Datos de la sesión (CreateSessionDTO)
- * @returns Sesión creada
- *
- * Teacher note:
- * - La sesión se crea en estado "no completada"
- * - Los puntos se calculan cuando se marca como completada
- */
 export const createSession = async (
   userId: string,
   sessionData: CreateSessionDTO
 ): Promise<ISessionDocument> => {
-  // Validar que la tarea existe y pertenece al usuario (si se proporciona)
   if (sessionData.taskId) {
     const task = await Task.findOne({
       _id: new Types.ObjectId(sessionData.taskId),
@@ -65,19 +40,6 @@ export const createSession = async (
   return session;
 };
 
-/*
- * Completar una sesión existente
- *
- * @param sessionId - ID de la sesión
- * @param userId - ID del usuario (para verificar permisos)
- * @returns Sesión actualizada con puntos + datos del usuario
- *
- * Teacher note:
- * - Marca la sesión como completada
- * - Calcula puntos usando calculateSessionPoints() de shared
- * - Actualiza puntos, nivel y racha del usuario
- * - Si hay taskId, incrementa completedPomodoros y actualiza estado
- */
 export const completeSession = async (
   sessionId: string,
   userId: string
@@ -85,7 +47,6 @@ export const completeSession = async (
   session: ISessionDocument;
   user: { level: number; points: number; streak: number };
 }> => {
-  // Buscar sesión y verificar permisos
   const session = await Session.findOne({
     _id: new Types.ObjectId(sessionId),
     userId: new Types.ObjectId(userId),
@@ -99,29 +60,24 @@ export const completeSession = async (
     throw new Error("La sesión ya está completada");
   }
 
-  // Obtener usuario para calcular puntos con racha
   const user = await User.findById(userId);
   if (!user) {
     throw new Error("Usuario no encontrado");
   }
 
-  // Usar utilidad de shared (no duplica lógica)
   const points = calculateSessionPoints(
     session.duration,
     session.type,
     user.streak
   );
 
-  // Marca sesión como completada
   session.completed = true;
   session.completedAt = new Date();
   session.pointsEarned = points;
   await session.save();
 
-  // Actualizar puntos del usuario
   user.points += points;
 
-  // Actualizar racha del usuario
   const lastCompletedSession = await Session.findOne({
     userId: user._id,
     completed: true,
@@ -138,19 +94,16 @@ export const completeSession = async (
     user.streak = 1; // Primera sesión
   }
 
-  // Usar utilidad shared para calcular nivel
   user.level = calculateLevel(user.points);
 
   await user.save();
 
-  // Si hay tarea asociada, incrementar completedPomodoros
   if (session.taskId) {
     const task = await Task.findById(session.taskId);
 
     if (task) {
       task.completedPomodoros += 1;
 
-      // Actualizar estado de la tarea automáticamente
       if (
         task.completedPomodoros >= task.estimatedPomodoros &&
         task.status !== TaskStatus.COMPLETED
@@ -174,14 +127,6 @@ export const completeSession = async (
   };
 };
 
-/*
- * Obtener sesiones del usuario (con paginación)
- *
- * @param userId - ID del usuario
- * @param filters - Filtros opcionales (completed)
- * @param limit - Número máximo de sesiones
- * @returns Array de sesiones
- */
 export const getUserSessions = async (
   userId: string,
   filters?: { completed?: boolean },
@@ -200,12 +145,6 @@ export const getUserSessions = async (
     .exec();
 };
 
-/*
- * Obtener estadísticas de las sesiones
- *
- * param userId - ID del usuario
- * @returns Objeto con estadístcas agregadas
- */
 export const getSessionStats = async (userId: string) => {
   const stats = await Session.aggregate([
     {
@@ -224,7 +163,6 @@ export const getSessionStats = async (userId: string) => {
     },
   ]);
 
-  // Obtener datos del usuario
   const user = await User.findById(userId).select("level points streak");
 
   return {

@@ -1,42 +1,11 @@
-/*
- * Controlador de Tareas (CRUD completo)
- *
- * Maneja la lógica de negocio para crear, leer, actualizar y eliminar tareas
- *
- * Teacher note:
- * - Todas las rutas requieren autenticación (middleware protect)
- * - Solo se permite acceso a tareas del usuario autenticado
- * - Usamos tipos de @pomodorise/shared para DTOs
- */
-
 import { Response } from "express";
 import Task from "../models/Task";
 import { AuthRequest } from "./authController";
 import { CreateTaskDTO, UpdateTaskDTO, TaskStatus } from "@pomodorise/shared";
 
-/*
- * Constantes de validación
- *
- * Teacher note:
- * - Centralizadas para fácil modificación
- * - Coherentes con frontend (MIN_POMODOROS, MAX_POMODOROS)
- */
 const MIN_POMODOROS = 1;
 const MAX_POMODOROS = 20;
 
-/*
- * Función auxiliar para validar y parsear pomodoros
- *
- * Teacher note:
- * - Acepta string (del frontend) o number (por retrocompatibilidad)
- * - Valida rango y tipo
- * - Devuelve número válido o lanza error descriptivo
- *
- * @param value - valor a validar (string | number)
- * @param fieldName - nombre del campo para mensaje de error
- * @throw Error si valor inválido
- * @returns number validado
- */
 function validateAndParsePomodoros(
   value: any,
   fieldName: string = "estimatedPomodoros"
@@ -68,18 +37,6 @@ function validateAndParsePomodoros(
   return numValue;
 }
 
-/*
- * GET /api/tasks
- * Obtiene todas las tareas del usuario autenticado
- *
- * Query params opcionales:
- * - status: filtrar por estado (pending, in_progress, completed)
- * - priority: filtra por prioridad (low, medium, high)
- *
- * Teacher note:
- * - Usamos lean() para obtener objetos JS planos (más rápido)
- * - El virtual 'progress' se incluye automáticamente con toJSON
- */
 export const getTask = async (
   req: AuthRequest,
   res: Response
@@ -90,7 +47,6 @@ export const getTask = async (
       return;
     }
 
-    // Contruir filtros dinámicos
     const filters: any = { userId: req.user._id };
 
     if (req.query.status) {
@@ -101,7 +57,6 @@ export const getTask = async (
       filters.priority = req.query.priority;
     }
 
-    // Obtener tareas con filtros y ordenar por fecha de creación
     const tasks = await Task.find(filters)
       .sort({ createdAt: -1 }) // más recientes primero
       .lean();
@@ -123,14 +78,6 @@ export const getTask = async (
   }
 };
 
-/*
- * GET /api/tasks/:id
- * Obtiene una tarea específica por ID
- *
- * Teacher note:
- * - Verificamos que la tarea pertenezca al usuario autenticado
- * - Devolvemos 404 si no existe o 403 si pertenece a otro usuario
- */
 export const getTaskById = async (
   req: AuthRequest,
   res: Response
@@ -148,7 +95,6 @@ export const getTaskById = async (
       return;
     }
 
-    // Verifica que la tarea pertenece al usuario
     if (task.userId.toString() !== req.user._id.toString()) {
       res
         .status(403)
@@ -165,19 +111,6 @@ export const getTaskById = async (
   }
 };
 
-/*
- * POST /api/tasks
- * Crea una nueva tarea
- *
- * Body esperado: CreateTaskDTO
- * {
- *    "title": "Estudiar TypeScript",
- *    "desciption": "Repasar generics y tipos avanzados",
- *    "priority": "high",
- *    "estimatedPomodoros": 4,
- *    "dueDate": "2025-10-20T00:00:00.000Z"
- * }
- */
 export const createTask = async (
   req: AuthRequest,
   res: Response
@@ -190,7 +123,6 @@ export const createTask = async (
 
     const taskData: CreateTaskDTO = req.body;
 
-    // Validación básica (en producción usar Zod o Joi)
     if (!taskData.title || !taskData.estimatedPomodoros) {
       res.status(400).json({
         error: "Campos obligatorios: title, estimatedPomodoros",
@@ -205,9 +137,6 @@ export const createTask = async (
       return;
     }
 
-    /*
-     * Validar y parsear estimatedPomodoros
-     */
     let validatedPomodoros: number;
     try {
       validatedPomodoros = validateAndParsePomodoros(
@@ -221,7 +150,6 @@ export const createTask = async (
       return;
     }
 
-    // Crea tarea asociada al usuario autenticado
     const task = await Task.create({
       title: taskData.title.trim(),
       description: taskData.description?.trim(),
@@ -250,16 +178,6 @@ export const createTask = async (
   }
 };
 
-/*
- * PUT /api/tasks/:id
- * Actualiza una tarea existente
- *
- * Body esperado: UpdateTaskDTO (todos los campos opcionales)
- *
- * Teacher note:
- * - Solo permite actualizar tareas del usuario autenticado
- * - Usa findOneAndUpdate para atomicidad
- */
 export const updateTask = async (
   req: AuthRequest,
   res: Response
@@ -272,7 +190,6 @@ export const updateTask = async (
 
     const updates: UpdateTaskDTO = req.body;
 
-    // Si se actualiza estimatedPomodoros, validar y pasear
     if (updates.estimatedPomodoros !== undefined) {
       try {
         updates.estimatedPomodoros = validateAndParsePomodoros(
@@ -287,7 +204,6 @@ export const updateTask = async (
       }
     }
 
-    // Buscar y actualizar solo si pertenece al usuario
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, userId: req.user._id },
       { $set: updates },
@@ -318,14 +234,6 @@ export const updateTask = async (
   }
 };
 
-/*
- * DELETE /api/tasks/:id
- * Elimina una tarea
- *
- * Teacher note:
- * - Soft delete recomendado en producción (campo deletedAt)
- * - Aquí hacemos hard delete por simplicidad
- */
 export const deleteTask = async (
   req: AuthRequest,
   res: Response
@@ -360,14 +268,6 @@ export const deleteTask = async (
   }
 };
 
-/*
- * PATCH /api/tasks/:id/complete-pomodoro
- * Incrementa el contador de pomodoros completados
- *
- * Teacher note:
- * - Endpoint específico para evitar sobrescribir otros campos
- * - Si completedPomodoros == estimatedPomodoros, cambia status a COMPLETED
- */
 export const completePomodoro = async (
   req: AuthRequest,
   res: Response
@@ -388,10 +288,8 @@ export const completePomodoro = async (
       return;
     }
 
-    // Incrementar pomodoros completados
     task.completedPomodoros += 1;
 
-    // Si alcanzó el estimado, marcar como completada
     if (task.completedPomodoros >= task.estimatedPomodoros) {
       task.status = TaskStatus.COMPLETED;
     } else if (task.status === TaskStatus.PENDING) {

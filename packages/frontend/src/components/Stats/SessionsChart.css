@@ -78,13 +78,6 @@
    RESPONSIVE
    ======================================== */
 
-/* 
- * En pantallas pequeñas, ajustar padding
- *
- * Teacher note:
- * - Recharts ya es responsive por ResponsiveContainer
- * - Solo necesitamos ajustar espaciados
-*/
 @media (max-width: 640px) {
   .sessions-chart {
     padding: var(--spacing-lg);

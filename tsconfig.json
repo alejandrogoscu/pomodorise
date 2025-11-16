@@ -4,5 +4,11 @@
     { "path": "./packages/shared" },
     { "path": "./packages/backend" },
     { "path": "./packages/frontend" }
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "packages/backend/jest.config.ts",
+    "packages/frontend/vite.config.ts"
   ]
 }

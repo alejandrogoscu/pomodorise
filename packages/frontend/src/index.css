@@ -1,12 +1,3 @@
-/* 
- * Estilos globales de la aplicación
- *
- * Teacher note:
- * - Reset básico para consistencia entre navegadores
- * - Variables CSS para tema consistente
- * - Configuracion de fuentes y colores base
-*/
-
 :root {
   /* Colores primarios */
   --color-primary: #320a6b;

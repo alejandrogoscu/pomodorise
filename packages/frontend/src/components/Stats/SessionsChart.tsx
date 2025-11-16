@@ -1,16 +1,3 @@
-/*
- * Componente SessionsChart - Gráfico de sesiones por día
- *
- * Teacher note:
- * - Usa Recharts para visualización de datos
- * - Componente presentacional (recibe datos por props)
- * - Responsive con ResponsiveContainer de Recharts
- * - CSS separado para estilos personalizados
- *
- * Analogía: SessionsChart es como un gráfico de ventas
- * (muestra tendencia de productividad a lo largo del tiempo)
- */
-
 import {
   LineChart,
   Line,
@@ -22,44 +9,11 @@ import {
 } from "recharts";
 import "./SessionsChart.css";
 
-/*
- * Props del componente SessionChart
- *
- * Teacher note:
- * - data: array de objetos { date: string, count: number }
- * - Viene directamente de UserStats.sessionsPerDay (hook useStats)
- */
 interface SessionsChartProps {
   data: Array<{ date: string; count: number }>;
 }
 
-/*
- * Componente SessionsChart
- *
- * @param props - data: sesiones agrupadas por día
- * @returns Gráfico de línea con sesiones por día
- *
- * @example
- * <SessionsChart
- *   data={[
- *     { date: "2025-01-15", count: 3 },
- *     { date: "2025-01-16", count: 5 }
- *   ]}
- * />
- *
- * Teacher note:
- * - ResponsiveContainer hace que el grádico se adapte al contenedor
- * - Tooltop muestra datos al pasar el mouse
- * - XAxis formatea fechas para mejorar legibilidad
- */
 function SessionsChart({ data }: SessionsChartProps) {
-  /*
-   * Formatear fecha para el eje x
-   *
-   * Teacher note:
-   * - Convierte "2025-01-15" a "15 Ene"
-   * - Más legible en el gráfico sin ocupar mucho espacio
-   */
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     const day = date.getDate();
@@ -67,13 +21,6 @@ function SessionsChart({ data }: SessionsChartProps) {
     return `${day} ${month}`;
   };
 
-  /*
-   * Si no hay datos, mostrar mensaje
-   *
-   * Teacher note:
-   * - Evita error de Recharts con array vacío
-   * - Mejora UX mostrando mensaje claro
-   */
   if (!data || data.length === 0) {
     return (
       <div className="sessions-chart sessions-chart-empty">

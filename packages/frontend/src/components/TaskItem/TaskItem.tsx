@@ -1,29 +1,6 @@
-/*
- * Componente TaskItem - Representación individual de una tarea
- *
- * Teacher note:
- * - Componente presentacional (recibe datos y callbacks como props)
- * - No maneja estado interno de la tarea (lo hace el padre: TaskList)
- * - Acciones: toggle complete, edit, delete
- * - Progreso visual: completedPomodoros / estimatedPomodoros
- *
- * Analogía: TaskItem es como una tarjeta en un tablero Kanban
- * (muestra info y acciones, pero el tablero controla la lista)
- */
-
 import { ITask, TaskPriority, TaskStatus } from "@pomodorise/shared";
 import "./TaskItem.css";
 
-/*
- * Props del componente TaskItem
- *
- * Teacher note:
- * - task: datos de la tarea a mostrar
- * - onToggleComplete: callback al marcar/descmarcar como completada
- * - onEdit: callback al hacer click en editar
- * - onDelete: callback al hacer click en eliminar
- * - Todos los callbacks son opcionales (permite TaskItem de solo lectura)
- */
 interface TaskItemProps {
   task: ITask;
   onToggleComplete?: (taskId: string, newStatus: TaskStatus) => void;
@@ -31,47 +8,14 @@ interface TaskItemProps {
   onDelete?: (taskId: string, taskTitle: string) => void;
 }
 
-/*
- * Componente TaskItem
- *
- * @example
- * <TaskITem
- *    task={myTask}
- *    onToggleComplete={(id, completed) => handleToggle(id, completed)}
- *    onEdit={(task) => setEditingTask(task)}
- *    onDelete={(id) => handleDelete(id)}
- * />
- */
 function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) {
-  /*
-   * Determinar si la tarea está completada
-   *
-   * Teacher note:
-   * - Ahora comparamos con TaskStatus.COMPLETED
-   * - Más explícito y type-safe
-   */
   const isCompleted = task.status === TaskStatus.COMPLETED;
 
-  /*
-   * Calcular porcentaje de progreso
-   *
-   * Teacher note:
-   * - Divide pomodoros completados entre estimados
-   * - Si estimatedPomodoros es 0, devolver 0 (evitar división por 0)
-   * - Se usa para la barra de progreso visual
-   */
   const progressPercentage =
     task.estimatedPomodoros > 0
       ? Math.min((task.completedPomodoros / task.estimatedPomodoros) * 100, 100)
       : 0;
 
-  /*
-   * Manejar toggle de completado
-   *
-   * Teacher note:
-   * - Si está completada, volver a PENDING
-   * - Si está pendiente o en progreso, marcar como COMPLETED
-   */
   const handleToggleComplete = () => {
     if (onToggleComplete) {
       const newStatus = isCompleted ? TaskStatus.PENDING : TaskStatus.COMPLETED;
@@ -79,9 +23,6 @@ function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) {
     }
   };
 
-  /*
-   * Obtener clase CSS según prioridad
-   */
   const getPriorityClass = (): string => {
     switch (task.priority) {
       case TaskPriority.HIGH:
@@ -95,18 +36,12 @@ function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) {
     }
   };
 
-  /*
-   * Manejar click en editar
-   */
   const handleEdit = () => {
     if (onEdit) {
       onEdit(task);
     }
   };
 
-  /*
-   * Manejar click en eliminar
-   */
   const handleDelete = () => {
     if (onDelete) {
       onDelete(task._id, task.title);

@@ -1,18 +1,8 @@
-/*
- * Test para TaskITem component
- *
- * Teacher note:
- * - Vitest es compatible con la API de Jest (describe, test, expect)
- * - Diferencias: import { vi } from 'vitest'
- * - React Testing Library es igual en ambos
- */
-
 import { describe, test, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import TaskItem from "@/components/TaskItem/TaskItem";
 import { ITask, TaskStatus, TaskPriority } from "@pomodorise/shared";
 
-// Mock task para testing
 const mockTask: ITask = {
   _id: "123",
   title: "Test Task",

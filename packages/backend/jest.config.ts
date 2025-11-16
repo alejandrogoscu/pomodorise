@@ -1,10 +1,3 @@
-/*
- * Configuración de Jest para test del backend
- *
- * Teacher note:
- * - ts-jest permite ejecutar tests TypeScript sin compilar
- * - testEnvironment: 'node' es necesario para backend (no DOM)
- */
 import type { Config } from "jest";
 
 const config: Config = {

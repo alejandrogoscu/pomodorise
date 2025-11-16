@@ -1,12 +1,3 @@
-/*
- * Test del servicio
- *
- * Teacher note:
- * - Usamos mock de axios para evitar llamadas reales a la API
- * - Verificamos que los datos se formatean correctamente
- * - Importante: estos son test unitarios (no de integración)
- */
-
 import { vi } from "vitest";
 import {
   getTasks,
@@ -17,7 +8,6 @@ import {
 import api from "../services/api";
 import { TaskStatus } from "@pomodorise/shared";
 
-// Mock del módulo api (ruta debe coincidir exactamente)
 vi.mock("../services/api", () => ({
   default: {
     get: vi.fn(),
@@ -27,7 +17,6 @@ vi.mock("../services/api", () => ({
   },
 }));
 
-// Tipado básico para el mock
 const mockedApi = api as unknown as {
   get: ReturnType<typeof vi.fn>;
   post: ReturnType<typeof vi.fn>;

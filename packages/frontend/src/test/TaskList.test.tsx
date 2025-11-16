@@ -1,23 +1,12 @@
-/*
- * Tests para TaskList component (usando Vitest)
- *
- * Teacher note:
- * - Mockear servicios (getTasks, updateTaskStatus, deleteTask)
- * - Probar filtros, loading, error, empty states
- * - Integración TaskList → TaskItem
- */
-
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import TaskList from "@/components/TaskList/TaskList";
 import * as taskService from "../services/taskService";
 import { ITask, TaskStatus, TaskPriority } from "@pomodorise/shared";
 
-// Mock del servicio de tareas
 vi.mock("../services/taskService");
 const mockedTaskService = taskService as any;
 
-// Mock TaskItem (para simplificar el render)
 vi.mock("../TaskItem/TaskItem", () => ({
   __esModule: true,
   default: ({ task, onToggleComplete, onDelete }: any) => (
@@ -43,7 +32,6 @@ vi.mock("../TaskItem/TaskItem", () => ({
   ),
 }));
 
-// Mock TaskForm
 vi.mock("../TaskForm/TaskForm", () => ({
   __esModule: true,
   default: ({ onCancel }: any) => (
@@ -54,7 +42,6 @@ vi.mock("../TaskForm/TaskForm", () => ({
   ),
 }));
 
-// Mock tasks para testing
 const mockTasks: ITask[] = [
   {
     _id: "1",
@@ -145,7 +132,6 @@ describe("TaskList", () => {
       expect(screen.getByText("Tarea pendiente")).toBeInTheDocument();
     });
 
-    // Filtrar por pendientes
     const pendingButton = screen.getByText(/Pendientes \(1\)/);
     fireEvent.click(pendingButton);
 
@@ -155,7 +141,6 @@ describe("TaskList", () => {
       expect(screen.queryByText("Tarea completada")).not.toBeInTheDocument();
     });
 
-    // Filtrar por completadas
     const completedButton = screen.getByText(/Completadas \(1\)/);
     fireEvent.click(completedButton);
 
