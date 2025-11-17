@@ -58,7 +58,11 @@ const Login = () => {
     } catch (err: any) {
       console.error("Error en login:", err);
 
-      if (err.response?.data?.error) {
+      if (err.code === "ECONNABORTED") {
+        setError(
+          "El servidor está tardando en responder. Por favor, intenta de nuevo en unos segundos"
+        );
+      } else if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else if (err.response?.status === 401) {
         setError("Email o contraseña incorrectos");

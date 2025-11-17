@@ -1,0 +1,26 @@
+services:
+  - name: pomodorise-backend
+    type: web
+    regions:
+      - fra # Frankfurt (Europa) — cambia si prefieres otra región
+    instance_type: free
+    ports:
+      - port: 4000
+        protocol: http
+    health_check:
+      http:
+        path: /health
+        port: 4000
+        # Importante: dar tiempo al cold start de MongoDB
+        grace_period: 30s
+        interval: 30s
+        timeout: 10s
+    docker:
+      dockerfile: packages/backend/Dockerfile
+      # Contexto desde la raíz del monorepo
+      context: .
+    env:
+      - name: NODE_ENV
+        value: production
+      - name: PORT
+        value: "4000"
