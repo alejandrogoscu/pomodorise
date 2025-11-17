@@ -161,6 +161,7 @@ This will launch both backend and frontend simultaneously.
 Potential features for future updates:
 
 - 🎵 Listen to music (Spotify or local tracks)
+- 🔈 Sound notification when Pomodoro completes
 - 📅 Calendar integration for scheduling sessions
 - 🌐 Multi-language support
 - 🏆 Rewards and gamification enhancements
