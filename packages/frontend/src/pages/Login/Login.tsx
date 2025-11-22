@@ -1,6 +1,7 @@
 import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import PomodoriseLogo from "/PomodoriseLogo.webp";
 import "./Login.css";
 import "../Form.css";
 
@@ -79,7 +80,14 @@ const Login = () => {
   return (
     <div className="login-page">
       <div className="login-container">
-        <h1 className="login-title">PomodoRise</h1>
+        <div className="login-header">
+          <img
+            className="login-logo"
+            src={PomodoriseLogo}
+            alt="PomodoRise Logo"
+          />
+          <h1 className="login-title">PomodoRise</h1>
+        </div>
         <p className="login-subtitle">Inicia sesión para continuar</p>
 
         {/* Mensaje de error general */}

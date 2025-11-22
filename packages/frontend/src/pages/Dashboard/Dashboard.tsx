@@ -7,6 +7,7 @@ import Timer, { TimerHandle } from "../../components/Timer/Timer";
 import TaskList, { TaskListHandle } from "../../components/TaskList/TaskList"; //
 import SessionsChart from "../../components/Stats/SessionsChart";
 import StatsCard from "../../components/StatsCard/StatsCard";
+import PomodoriseLogo from "/PomodoriseLogo.webp";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -33,7 +34,14 @@ const Dashboard = () => {
   return (
     <div className="dashboard-page">
       <header className="dashboard-header">
-        <h1 className="dashboard-title">PomodoRise</h1>
+        <div className="header-logo">
+          <img
+            className="dashboard-logo"
+            src={PomodoriseLogo}
+            alt="PomodoRise logo"
+          />
+          <h1 className="dashboard-title">PomodoRise</h1>
+        </div>
         <div className="header-user">
           <span className="user-name">{user?.name || user?.email}</span>
           <button className="logout-button" onClick={handleLogout}>

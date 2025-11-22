@@ -1,6 +1,7 @@
 import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import PomodoriseLogo from "/PomodoriseLogo.webp";
 import "./Register.css";
 import "../Form.css";
 
@@ -85,7 +86,14 @@ const Register = () => {
   return (
     <div className="register-page">
       <div className="register-container">
-        <h1 className="register-title">PomodoRise</h1>
+        <div className="register-header">
+          <img
+            className="register-logo"
+            src={PomodoriseLogo}
+            alt="PomodoRise Logo"
+          />
+          <h1 className="register-title">PomodoRise</h1>
+        </div>
         <p className="register-subtitle">Crea tu cuenta</p>
 
         {/* Mensaje de error general */}

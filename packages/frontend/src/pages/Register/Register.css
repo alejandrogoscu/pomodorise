@@ -33,6 +33,19 @@
    ENCABEZADO
    ======================================== */
 
+.register-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+}
+
+.register-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
 .register-title {
   font-size: 2rem;
   font-weight: 800;
