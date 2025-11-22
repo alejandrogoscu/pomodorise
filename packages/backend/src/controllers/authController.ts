@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import jwt, { SignOptions } from "jsonwebtoken";
 import User, { IUser } from "../models/User";
+import { getRandomAvatar } from "../utils/avatar";
 
 export interface AuthRequest extends Request {
   user?: IUser;
@@ -40,10 +41,13 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    const avatar = getRandomAvatar();
+
     const user = await User.create({
       email,
       password,
       name,
+      avatar,
     });
 
     const token = generateToken(user._id.toString());
@@ -55,6 +59,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         id: user._id,
         email: user.email,
         name: user.name,
+        avatar: user.avatar,
         level: user.level,
         points: user.points,
         streak: user.streak,
@@ -110,6 +115,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         id: user._id,
         email: user.email,
         name: user.name,
+        avatar: user.avatar,
         level: user.level,
         points: user.points,
         streak: user.streak,
@@ -141,6 +147,7 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
         id: req.user._id,
         email: req.user.email,
         name: req.user.name,
+        avatar: req.user.avatar,
         level: req.user.level,
         points: req.user.points,
         streak: req.user.streak,

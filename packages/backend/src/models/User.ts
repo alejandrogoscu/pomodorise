@@ -35,6 +35,12 @@ const UserSchema = new Schema<IUser>(
       maxlength: [50, "El nombre no puede exceder 50 caracteres"],
     },
 
+    avatar: {
+      type: String,
+      required: [true, "El avatar avatar es obligatorio"],
+      default: "https://i.imgur.com/blsTdRZ",
+    },
+
     level: {
       type: Number,
       default: 1,
