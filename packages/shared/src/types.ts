@@ -1,11 +1,11 @@
 export const AVATAR_OPTIONS = [
-  "https://i.imgur.com/blsTdRZ",
-  "https://i.imgur.com/blsTdRZ",
-  "https://i.imgur.com/HEDlSDW",
-  "https://i.imgur.com/RfYWVly",
-  "https://i.imgur.com/NRY0cfr",
-  "https://i.imgur.com/6TpaAwp",
-  "https://i.imgur.com/MgeJHC9",
+  "https://i.imgur.com/blsTdRZ.png",
+  "https://i.imgur.com/blsTdRZ.png",
+  "https://i.imgur.com/HEDlSDW.png",
+  "https://i.imgur.com/RfYWVly.png",
+  "https://i.imgur.com/NRY0cfr.png",
+  "https://i.imgur.com/6TpaAwp.png",
+  "https://i.imgur.com/MgeJHC9.png",
 ] as const;
 
 export type Avatar = (typeof AVATAR_OPTIONS)[number];

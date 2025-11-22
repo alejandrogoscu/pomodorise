@@ -11,9 +11,7 @@ function UserProfile() {
   }
 
   const nextLevelPoints = pointsForNextLevel(user.level);
-
   const levelProgressPercent = calculateLevelProgress(user.points, user.level);
-
   const pointsToNextLevel = Math.max(0, nextLevelPoints - user.points);
 
   return (
@@ -21,7 +19,23 @@ function UserProfile() {
       {/* Sección superior: avatar + info básica */}
       <div className="user-profile-header">
         <div className="user-profile-avatar">
-          <span className="user-profile-avatar-text">
+          <img
+            src={user.avatar}
+            alt={`Avatar de ${user.name || user.email}`}
+            className="user-profile-avatar-image"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = "none";
+              const fallback = target.nextElementSibling;
+              if (fallback) {
+                (fallback as HTMLElement).style.display = "flex";
+              }
+            }}
+          />
+          <span
+            className="user-profile-avatar-text"
+            style={{ display: "none" }}
+          >
             {user.name?.charAt(0).toUpperCase() ||
               user.email.charAt(0).toUpperCase()}
           </span>
