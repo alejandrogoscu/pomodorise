@@ -1,3 +1,15 @@
+export const AVATAR_OPTIONS = [
+  "https://i.imgur.com/blsTdRZ",
+  "https://i.imgur.com/blsTdRZ",
+  "https://i.imgur.com/HEDlSDW",
+  "https://i.imgur.com/RfYWVly",
+  "https://i.imgur.com/NRY0cfr",
+  "https://i.imgur.com/6TpaAwp",
+  "https://i.imgur.com/MgeJHC9",
+] as const;
+
+export type Avatar = (typeof AVATAR_OPTIONS)[number];
+
 export enum TaskStatus {
   PENDING = "pending",
   IN_PROGRESS = "in_progress",
@@ -14,6 +26,7 @@ export interface IUser {
   _id: string; // En frontend será string, en backend ObjectId
   email: string;
   name?: string;
+  avatar: string;
   level: number;
   points: number;
   streak: number;
@@ -26,6 +39,7 @@ export interface IUserDocument {
   email: string;
   password: string; // Hash, nunca texto plano
   name?: string;
+  avatar: string;
   level: number;
   points: number;
   streak: number;
