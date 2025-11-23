@@ -2,11 +2,11 @@ const audioCache = new Map<string, HTMLAudioElement>();
 let globalVolume = 0.7;
 let isMuted = false;
 
-export type SoundType = "pomodoro-complete" | "break-pomodoro" | "notification";
+export type SoundType = "pomodoro-complete" | "break-complete" | "notification";
 
 const SOUND_PATHS: Record<SoundType, string> = {
   "pomodoro-complete": "/sounds/pomodoro-complete.ogg",
-  "break-pomodoro": "/sounds/break-complete.ogg",
+  "break-complete": "/sounds/break-complete.ogg",
   notification: "/sounds/notification.ogg",
 };
 

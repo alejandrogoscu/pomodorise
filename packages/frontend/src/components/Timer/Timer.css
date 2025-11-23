@@ -30,15 +30,35 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-md);
 }
 
 .timer-type {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 600;
   color: var(--color-gray-50);
   margin: 0;
-  min-width: 220px;
-  text-align: center;
+  flex: 1;
+  text-align: left;
+}
+
+.timer-mute-button {
+  background: none;
+  border-radius: var(--border-radius-lg);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.timer-mute-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
 }
 
 .timer-pomodoros {
@@ -269,9 +289,19 @@
 /* ========================================
    RESPONSIVE
    ======================================== */
-@media (max-width: 890px) {
+@media (max-width: 920px) {
   .timer-type {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+  }
+
+  .timer-mute-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .timer-mute-icon {
+    width: 34px;
+    height: 34px;
   }
 
   .timer-pomodoros {
@@ -292,6 +322,16 @@
 
   .timer-type {
     font-size: 1.25rem;
+  }
+
+  .timer-mute-button {
+    width: 35px;
+    height: 35px;
+  }
+
+  .timer-button-icon {
+    width: 28px;
+    height: 28px;
   }
 
   .timer-circle-container {

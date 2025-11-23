@@ -11,6 +11,7 @@ import { formatTime, calculateProgress } from "../../utils/timeFormat";
 import { getTasks } from "../../services/taskService";
 import { ITask, TaskStatus } from "@pomodorise/shared";
 import { useToast } from "../../context/ToastContext";
+import { getMute, setMute } from "../../utils/audio";
 import "./Timer.css";
 
 interface TimerProps {
@@ -29,6 +30,8 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
     const [activeTasks, setActiveTasks] = useState<ITask[]>([]);
     const [selectedTaskId, setSelectedTaskId] = useState<string>("");
     const [isLoadingTasks, setIsLoadingTasks] = useState(false);
+
+    const [isMuted, setIsMuted] = useState<boolean>(getMute());
 
     const loadActiveTasks = useCallback(async () => {
       setIsLoadingTasks(true);
@@ -128,6 +131,17 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
       onError: handleError,
     });
 
+    const toggleMute = useCallback(() => {
+      const newMuteState = !isMuted;
+      setMute(newMuteState);
+      setIsMuted(newMuteState);
+
+      showToast(
+        newMuteState ? "Sonidos desactivados" : "Sonidos activados",
+        "info"
+      );
+    }, [isMuted, showToast]);
+
     const radius = 120; // radio del círculo en píxeles
     const circumference = 2 * Math.PI * radius;
     const progress = calculateProgress(timeLeft, totalTime);
@@ -136,11 +150,11 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
     const getTypeLabel = (): string => {
       switch (type) {
         case "work":
-          return "Tiempo de trabajo";
+          return "Trabajo";
         case "break":
-          return "Descanso corto";
+          return "Pausa";
         case "long_break":
-          return "Descanso largo";
+          return "Recarga";
         default:
           return "Pomodoro";
       }
@@ -165,9 +179,21 @@ const Timer = forwardRef<TimerHandle, TimerProps>(
         {/* Header con tipo de sesión y contador de pomodoros */}
         <div className="timer-header">
           <h2 className="timer-type">{getTypeLabel()}</h2>
+
           <span className="timer-pomodoros">
             {completedPomodoros} completados
           </span>
+
+          <button
+            className="timer-mute-button"
+            onClick={toggleMute}
+            aria-label={isMuted ? "Activar sonidos" : "Desactivar sonidos"}
+            title={isMuted ? "Activar sonidos" : "Desactivar sonidos"}
+          >
+            <svg width={42} height={42} className="timer-mute-icon">
+              <use href={`/icons.svg#icon-sound-${isMuted ? "off" : "on"}`} />
+            </svg>
+          </button>
         </div>
 
         {/* Selector de tarea */}

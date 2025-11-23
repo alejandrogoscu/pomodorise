@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import * as sessionService from "../services/sessionService";
+import { playSound, preloadSound } from "../utils/audio";
 
 export type TimerType = "work" | "break" | "long_break";
 
 export type TimerStatus = "idle" | "running" | "paused" | "completed";
 
 const DURATIONS: Record<TimerType, number> = {
-  work: 25 * 60,
+  work: 1 * 60,
   break: 5 * 60,
   long_break: 15 * 60,
 };
@@ -36,6 +37,11 @@ export function useTimer(options: UseTimerOptions = {}) {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const totalTime = DURATIONS[type];
+
+  useEffect(() => {
+    preloadSound("pomodoro-complete");
+    preloadSound("break-complete");
+  });
 
   useEffect(() => {
     return () => {
@@ -84,11 +90,13 @@ export function useTimer(options: UseTimerOptions = {}) {
     try {
       const result = await sessionService.completeSession(currentSessionId);
 
-      console.log("Session completada:", {
-        puntos: result.pointsEarned,
-        nivel: result.user.level,
-        racha: result.user.streak,
-      });
+      try {
+        const soundType =
+          type === "work" ? "pomodoro-complete" : "break-complete";
+        await playSound(soundType);
+      } catch (audioError) {
+        console.warn("⚠️ No se pudo reproducir el sonido:", audioError);
+      }
 
       if (onComplete) {
         onComplete({

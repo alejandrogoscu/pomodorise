@@ -40,4 +40,15 @@
     <path d="M12 2a10 10 0 1010 10H12V2zm-1 10H2a10 10 0 0010 10v-10z"/>
   </symbol>
 
+  <!-- SONIDO ON -->
+  <symbol id="icon-sound-on" viewBox="0 0 24 24" fill="var(--color-accent)">
+    <path d="M4 9v6h4l5 4V5L8 9H4zm10.5 3a3.5 3.5 0 00-1.5-2.87v5.74A3.5 3.5 0 0014.5 12zm2.5 0c0 2.4-1.33 4.47-3.25 5.5l-.5-.87c1.54-.87 2.5-2.44 2.5-4.63s-.96-3.76-2.5-4.63l.5-.87C15.67 7.53 17 9.6 17 12z"/>
+  </symbol>
+
+  <!-- SONIDO OFF -->
+  <symbol id="icon-sound-off" viewBox="0 0 24 24" fill="var(--color-accent)">
+    <path d="M4 9v6h4l5 4V5L8 9H4zm11.59 3l2.12 2.12-.88.88L14.7 12.9 12.6 15l-.88-.88L13.82 12 11.7 9.88l.88-.88 2.12 2.12 2.12-2.12.88.88L16.47 12z"/>
+  </symbol>
+
+
 </svg>
