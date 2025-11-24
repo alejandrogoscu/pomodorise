@@ -7,7 +7,7 @@ export type TimerType = "work" | "break" | "long_break";
 export type TimerStatus = "idle" | "running" | "paused" | "completed";
 
 const DURATIONS: Record<TimerType, number> = {
-  work: 1 * 60,
+  work: 25 * 60,
   break: 5 * 60,
   long_break: 15 * 60,
 };
